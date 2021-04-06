@@ -5,6 +5,9 @@ target/
 .idea/
 *.iml
 
+#Settings
+settings.ini
+
 #Database
 *.db
 
