@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<StackPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.editPanel.LogoController">
+   <children>
+      <VBox>
+         <children>
+            <StackPane fx:id="logoArea" onMouseClicked="#setLogoSize" onMouseDragged="#setLogoSize" style="-fx-background-color: white; -fx-border-width: 2; -fx-border-color: black;" VBox.vgrow="ALWAYS">
+               <children>
+                  <Rectangle fx:id="logoRectangle" arcHeight="5.0" arcWidth="5.0" fill="#c3c3c3" height="100.0" stroke="BLACK" strokeType="INSIDE" width="100.0" />
+                  <Label fx:id="logoSizeLabel" text="Logo">
+                     <font>
+                        <Font name="Segoe UI" size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+               <cursor>
+                  <Cursor fx:constant="CROSSHAIR" />
+               </cursor>
+            </StackPane>
+            <Button mnemonicParsing="false" onAction="#save" text="Save" />
+         </children>
+      </VBox>
+   </children>
+</StackPane>

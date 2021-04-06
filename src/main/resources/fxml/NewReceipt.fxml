@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.NewReceiptController">
+   <children>
+      <SplitPane fx:id="splitPane" dividerPositions="0.0">
+         <items>
+            <VBox fx:id="leftSplitBox" alignment="TOP_CENTER" style="-fx-background-color: white;">
+               <children>
+                  <StackPane fx:id="conteinerForLogo" onMouseEntered="#onMauseSourceEnter" onMouseExited="#onMauseSourceExit">
+                     <children>
+                        <Label fx:id="sourceLabel" textAlignment="CENTER" wrapText="true">
+                           <font>
+                              <Font name="Segoe UI Bold" size="36.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="DEFAULT" />
+                           </cursor>
+                        </Label>
+                        <ImageView fx:id="logoImageView" onMouseClicked="#deleteSource" onMouseEntered="#onMauseSourceEnter" onMouseExited="#onMauseSourceExit" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </StackPane>
+                  <HBox alignment="CENTER" spacing="5.0" style="-fx-background-color: f1f1f1;">
+                     <children>
+                        <Label fx:id="expenseLabel" onMouseClicked="#deleteExpense" onMouseEntered="#onMauseExpenseEnter" onMouseExited="#onMauseExpenseExit">
+                           <font>
+                              <Font name="Courier New Bold" size="20.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="unitLabel" onMouseClicked="#deleteUnit" onMouseEntered="#onMauseUnitEnter" onMouseExited="#onMauseUnitExit">
+                           <font>
+                              <Font name="Courier New Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+                  <StackPane fx:id="stackForInputPanels" alignment="TOP_CENTER" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="96.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER">
+                           <image>
+                              <Image url="@../icons/loading-circle.gif" />
+                           </image>
+                        </ImageView>
+                     </children></StackPane>
+               </children>
+            </VBox>
+            <VBox fx:id="centerSplitBox">
+               <children>
+                  <HBox alignment="CENTER_RIGHT" nodeOrientation="LEFT_TO_RIGHT" spacing="5.0">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <Label text="Date:">
+                           <font>
+                              <Font name="Courier New" size="20.0" />
+                           </font></Label>
+                        <DatePicker fx:id="transactionDatePicker" editable="false" />
+                        <Button fx:id="saveReciptButton" disable="true" focusTraversable="false" mnemonicParsing="false" onAction="#saveRecipt" text="Save Recipt">
+                           <font>
+                              <Font name="Courier New" size="20.0" />
+                           </font></Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </items>
+      </SplitPane>
+   </children>
+</Pane>

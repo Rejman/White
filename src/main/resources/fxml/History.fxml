@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.HistoryController">
+   <children>
+      <HBox />
+      <SplitPane fx:id="splitPane" dividerPositions="0.5">
+         <items>
+            <VBox fx:id="tableBox" style="-fx-background-color: white;">
+               <children>
+                  <VBox fx:id="labelBox" alignment="CENTER" />
+               </children>
+            </VBox>
+            <VBox fx:id="leftBox" alignment="TOP_CENTER" styleClass="historyContent">
+               <children>
+                  <Label text="Transaction history" />
+                  <ScrollPane fx:id="scrolPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS" VBox.vgrow="ALWAYS">
+                     <content>
+                        <VBox fx:id="groupVBox" alignment="CENTER" style="-fx-background-color: white;">
+                           <children>
+                              <ImageView fitHeight="96.0" fitWidth="96.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../icons/loading-circle.gif" />
+                                 </image>
+                              </ImageView>
+                           </children></VBox>
+                     </content>
+                     <effect>
+                        <Blend />
+                     </effect>
+                  </ScrollPane>
+               </children>
+            </VBox>
+         </items>
+      </SplitPane>
+   </children>
+</Pane>

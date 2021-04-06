@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="containerWithMenus" alignment="TOP_CENTER" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.MainController">
+   <children>
+      <VBox alignment="TOP_CENTER" style="-fx-background-color: white;">
+         <children>
+            <ToolBar fx:id="toolBar">
+              <items>
+                  <MenuButton fx:id="dataBaseButton" mnemonicParsing="false" text="File">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open database">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator></MenuItem>
+                      <MenuItem mnemonicParsing="false" onAction="#newDatabase" text="New database">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator></MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" onAction="#fullscreen" text="Fullscreen">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="F12" control="ANY" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator>
+                        </MenuItem>
+                        <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="Q" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator>
+                        </MenuItem>
+                    </items>
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icons/file-48.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </MenuButton>
+                  <Separator orientation="VERTICAL" />
+                  <ToggleButton fx:id="receiptButton" disable="true" mnemonicParsing="false" onAction="#newReceipt">
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icons/add-basket-48.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Add new recipt" />
+                     </tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="editButton" disable="true" mnemonicParsing="false" onAction="#edit">
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icons/edit-property-48.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Edit propherty" />
+                     </tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="historyButton" disable="true" mnemonicParsing="false" onAction="#history">
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icons/payment-history-48.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Show transaction history" />
+                     </tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="statisticButton" disable="true" mnemonicParsing="false" onAction="#statistics">
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icons/pie-chart-48.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Show statistics" />
+                     </tooltip>
+                  </ToggleButton>
+                  <ToggleButton fx:id="settingsButton" disable="true" mnemonicParsing="false" onAction="#settings">
+                     <graphic>
+                        <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icons/tune-48.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <tooltip>
+                        <Tooltip text="Settings" />
+                     </tooltip>
+                  </ToggleButton>
+              </items>
+            </ToolBar>
+            <ProgressBar fx:id="progressBar" focusTraversable="false" maxHeight="15.0" minHeight="15.0" progress="0.0" style="-fx-accent: green;" visible="false" VBox.vgrow="ALWAYS">
+               <padding>
+                  <Insets bottom="-1.0" left="-1.0" right="-1.0" top="-1.0" />
+               </padding>
+            </ProgressBar>
+            <Pane fx:id="viewsContainer" VBox.vgrow="ALWAYS" />
+            <HBox alignment="TOP_RIGHT" style="-fx-border-width: 1px 0px 0px 0px 0px; -fx-border-color: grey;">
+               <children>
+                  <Label fx:id="statusLabel" text="status info">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding></Label>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</StackPane>

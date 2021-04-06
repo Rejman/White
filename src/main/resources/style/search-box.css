@@ -1,0 +1,54 @@
+.search-box{
+    -fx-font-family: "Courier New";
+    -fx-font-size: 20;
+}
+/*.search-box .list-cell{
+    -fx-border-width: 3;
+    -fx-border-color: transparent;
+    *//*-fx-border-insets: 3;
+    *//*
+}*/
+.search-box .list-cell:selected{
+    -fx-font-weight: bold;
+    -fx-background-color:grey;
+}
+/*.search-box .list-cell:focused{
+
+    -fx-text-fill: red;
+    -fx-underline: true;
+}*/
+/*.test{
+    -fx-border-color: grey;
+    -fx-font-weight: bold;
+}*/
+/*.search-box .list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected {
+    *//*-fx-underline: true;*//*
+
+    *//*-fx-border-insets: 3;*//*
+    -fx-border-color: grey;
+    -fx-font-weight: bold;
+}*/
+/*#white-test .list-cell{
+    -fx-text-fill: red;
+}*/
+
+/*.search-box .list-cell:filled:selected, .search-box .list-cell:filled:selected {
+
+*//*    -fx-border-width: 0 0 1 0;
+    -fx-border-color: black;
+    -fx-border-insets: 3;
+    -fx-border-color: black;*//*
+    -fx-text-fill: black;
+
+    -fx-underline: true;
+
+}*/
+/*.search-box .list-cell:filled:hover {
+    -fx-cell-hover-color: #0093ff;
+    -fx-text-fill: white;
+}*/
+/*
+.button:hover {
+    -fx-background-color: #fafafa;
+
+}*/

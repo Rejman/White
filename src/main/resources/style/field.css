@@ -1,0 +1,47 @@
+
+/*.text-field, .comma{
+    -fx-font-family: "Courier New";
+    -fx-font-size: 17;
+    *//*-fx-background-color: white;*//*
+    -fx-border-width: 0;
+    -fx-border-color: grey;
+    -fx-prompt-text-fill: derive(-fx-control-inner-background,-100%);
+
+}
+.comma{
+    -fx-background-color: white;
+    -fx-padding: 5 -3 5 -3;
+    *//*-fx-border-style: solid hidden solid hidden;*//*
+}*/
+.int{
+    -fx-alignment: center-right;
+    -fx-min-width: 150;
+    -fx-max-width: 150;
+}
+.prefix{
+    -fx-alignment: center-right;
+    -fx-padding: 5 0 5 5;
+    /*-fx-border-style: solid hidden solid solid;*/
+
+}
+.prefix-double{
+    -fx-min-width: 120;
+    -fx-max-width: 120;
+}
+.prefix-triple{
+    -fx-min-width: 110;
+    -fx-max-width: 110;
+}
+.sufix{
+    -fx-alignment: center-left;
+    -fx-padding: 5 5 5 0;
+    /*-fx-border-style: solid solid solid hidden;*/
+}
+.sufix-double{
+    -fx-min-width: 30;
+    -fx-max-width: 30;
+}
+.sufix-triple{
+    -fx-min-width: 40;
+    -fx-max-width: 40;
+}

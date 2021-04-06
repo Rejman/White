@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controllers.widgets.inputPanels.ImageEntry">
+   <children>
+      <ImageView fx:id="imageImageView" fitHeight="98.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+      <HBox alignment="CENTER">
+         <children>
+            <ImageView fx:id="fileImage" fitHeight="48.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/image-file-add-48.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="pasteImage" fitHeight="48.0" fitWidth="48.0" onMouseClicked="#pasteFromClipboard" onMouseEntered="#clipboardEnter" onMouseExited="#clipboardExit" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../icons/paste-48.png" />
+               </image>
+            </ImageView>
+         </children>
+      </HBox>
+   </children>
+</StackPane>

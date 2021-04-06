@@ -1,0 +1,13 @@
+.historyPosition{
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: black;
+    -fx-border-insets: 3;
+    -fx-font-family: "Courier New";
+    -fx-font-size: 20;
+    /*
+    -fx-min-width: 200;*/
+}
+.historyContent{
+    -fx-font-family: "Courier New";
+    -fx-font-size: 20;
+}

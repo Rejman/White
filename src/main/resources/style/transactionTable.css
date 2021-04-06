@@ -1,0 +1,36 @@
+.transactionTable{
+
+    -fx-font-family: "Courier New";
+    -fx-font-size: 20;
+}
+.transactionTable .table-row-cell{
+    -fx-background-color: white;
+    -fx-table-cell-border-color:white;
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color:white;
+}
+.transactionTable .table-row-cell:odd{
+    -fx-background-color: white;
+}
+.transactionTable .table-row-cell:selected {
+    -fx-selection-bar: white;
+}
+.center-col {
+  -fx-alignment: CENTER;
+}
+.left-col {
+  -fx-alignment: CENTER-LEFT;
+}
+.right-col {
+  -fx-alignment: CENTER-RIGHT;
+}
+.context {
+    -fx-font-family: "Courier New";
+    -fx-font-size: 20;
+}
+#white .text{
+    -fx-fill : white;
+}
+#black .text{
+    -fx-fill : black;
+}
