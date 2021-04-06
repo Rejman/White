@@ -4,16 +4,13 @@ import Dao.DaoContainer;
 import Models.Expense;
 import Models.Source;
 import Models.Tag;
-import Utils.Blocker;
-import Utils.DBManager;
-import Utils.ModelStructure;
-import Utils.Serialize;
+import Utils.*;
+import Utils.Settings.Settings;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
@@ -35,6 +32,8 @@ import java.util.HashSet;
 public class MainController extends Controller {
 
     private final FileChooser fileChooser = new FileChooser();
+    @FXML
+    private Menu openRecentMenu;
     @FXML
     public Label statusLabel;
     private static Stage primaryStage;
@@ -58,7 +57,6 @@ public class MainController extends Controller {
     private ToggleButton settingsButton;
     @FXML
     private ToolBar toolBar;
-    private String dataBaseName;
     private String dataBaseUrl;
 
     @FXML
@@ -90,12 +88,20 @@ public class MainController extends Controller {
 
                 @Override
                 protected void succeeded() {
-                    settings.recentDB = dataBaseUrl;
-                    Serialize.saveSettings(settings);
+                    //DBPosition dbPosition = new DBPosition(dataBaseUrl);
+                    String lastDBUrl = settings.recentDBs.getLast();
 
+                    if(lastDBUrl==null || !lastDBUrl.equals(dataBaseUrl)){
+                        settings.recentDBs.add(dataBaseUrl);
+                        updateOpenRecentMenu();
+                        Serialize.saveSettings(settings);
+                    }
+                    dataBaseButton.setText("File ["+Settings.cutPath(dataBaseUrl)+"]");
                     statusLabel.setText(dataBaseUrl + " loaded");
                     activeAllToggleButtons();
                     Blocker.unbind();
+                    loadNewView("History","History");
+
                 }
             };
         }
@@ -224,22 +230,38 @@ public class MainController extends Controller {
         setAutoWidth(progressBar, 100);
         Controller.widthProperty.bind(containerWithMenus.widthProperty());
         Controller.heightProperty.bind(containerWithMenus.heightProperty());
+        updateOpenRecentMenu();
+        String lastDB = settings.recentDBs.getLast();
 
-        if(settings.recentDB!=null){
-            dataBaseUrl = settings.recentDB;
-            dataBaseName = fileNameControl(dataBaseUrl);
+        if(lastDB!=null){
+            dataBaseUrl = lastDB;
             Blocker.bind(loadData.progressProperty());
             loadData.reset();
             loadData.start();
         }
-        // load database tag_test.db
-/*        dataBaseUrl = "C:/Users/rreej/IdeaProjects/White/database/tag_test.db";
-        dataBaseName = "tag_test";
-        Blocker.bind(loadData.progressProperty());
-        loadData.reset();
-        loadData.start();*/
     }
+    public void updateOpenRecentMenu(){
+        openRecentMenu.getItems().clear();
+        for (String url:settings.recentDBs
+             ) {
+            if(url!=null){
+                MenuItem menuItem = new MenuItem(Settings.cutPath(url));
+                menuItem.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        dataBaseUrl = url;
+                        Blocker.bind(loadData.progressProperty());
+                        loadData.reset();
+                        loadData.start();
+                    }
+                });
+                openRecentMenu.getItems().add(menuItem);
+            }else{
+                break;
+            }
+        };
 
+    }
     @FXML
     void edit(ActionEvent event) {
         loadNewView("editPanel/EditPanel", "Edit");
@@ -284,7 +306,7 @@ public class MainController extends Controller {
         daoContainer = new DaoContainer(path);
 
         dataBaseUrl = path;
-        dataBaseName = selectedFile.getName();
+        //dataBaseName = selectedFile.getName();
         System.out.println("create: " + path);
         Blocker.bind(createDatabase.progressProperty());
         createDatabase.reset();
@@ -296,9 +318,9 @@ public class MainController extends Controller {
     void openFile(ActionEvent event) {
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
         String path = selectedFile.getPath();
-        dataBaseName = selectedFile.getName();
-        dataBaseName = dataBaseName.substring(0, dataBaseName.length() - 3);
-        fileNameControl(path);
+        //dataBaseName = selectedFile.getName();
+        //dataBaseName = dataBaseName.substring(0, dataBaseName.length() - 3);
+        //fileNameControl(path);
         this.dataBaseUrl = path;
 
         System.out.println("open: " + dataBaseUrl);
