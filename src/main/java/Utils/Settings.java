@@ -12,7 +12,7 @@ public class Settings implements Serializable{
     public int logoWidth = 100;
     public int logoHeight = 100;
     public int logoTextSize = 36;
-    public Queue<String> recentDB = new LimitedQueue<>(5);
+    public String recentDB = null;
 
     public Settings(){
     }

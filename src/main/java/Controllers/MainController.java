@@ -90,10 +90,9 @@ public class MainController extends Controller {
 
                 @Override
                 protected void succeeded() {
-                    settings.recentDB.add(dataBaseUrl);
+                    settings.recentDB = dataBaseUrl;
                     Serialize.saveSettings(settings);
-                    System.out.println(settings.recentDB);
-                    dataBaseButton.setText("File ["+dataBaseName+"]");
+
                     statusLabel.setText(dataBaseUrl + " loaded");
                     activeAllToggleButtons();
                     Blocker.unbind();
@@ -226,6 +225,13 @@ public class MainController extends Controller {
         Controller.widthProperty.bind(containerWithMenus.widthProperty());
         Controller.heightProperty.bind(containerWithMenus.heightProperty());
 
+        if(settings.recentDB!=null){
+            dataBaseUrl = settings.recentDB;
+            dataBaseName = fileNameControl(dataBaseUrl);
+            Blocker.bind(loadData.progressProperty());
+            loadData.reset();
+            loadData.start();
+        }
         // load database tag_test.db
 /*        dataBaseUrl = "C:/Users/rreej/IdeaProjects/White/database/tag_test.db";
         dataBaseName = "tag_test";
