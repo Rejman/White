@@ -2,7 +2,7 @@ package Controllers;
 
 import Dao.DaoContainer;
 import Utils.ModelStructure;
-import Utils.Settings;
+import Utils.Settings.Settings;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.layout.Region;

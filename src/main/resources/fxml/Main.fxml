@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
@@ -26,14 +27,15 @@
               <items>
                   <MenuButton fx:id="dataBaseButton" mnemonicParsing="false" text="File">
                     <items>
-                      <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open database">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                           </accelerator></MenuItem>
-                      <MenuItem mnemonicParsing="false" onAction="#newDatabase" text="New database">
+                      <MenuItem mnemonicParsing="false" onAction="#newDatabase" text="New">
                            <accelerator>
                               <KeyCodeCombination alt="UP" code="N" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                            </accelerator></MenuItem>
+                      <MenuItem mnemonicParsing="false" onAction="#openFile" text="Open...">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="O" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                           </accelerator></MenuItem>
+                        <Menu fx:id="openRecentMenu" mnemonicParsing="false" text="Open Recent" />
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem mnemonicParsing="false" onAction="#fullscreen" text="Fullscreen">
                            <accelerator>
