@@ -3,12 +3,9 @@ package Controllers.widgets.inputPanels;
 import Controllers.Controller;
 import Controllers.widgets.ColorChooser.ColorChooser;
 import Models.Source;
-import Utils.ColorConvertor;
 import Utils.ModelStructure;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
@@ -20,10 +17,8 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class SourcePanel extends Panel<Source> {
     public static final String iconURL = "icons/shop-24.png";
@@ -50,107 +45,11 @@ public class SourcePanel extends Panel<Source> {
         this.containerForLogo = containerForLogo;
 
 
-
         selectBox.addData(modelStructure.getSources());
 
         newSourcePanel.getChildren().add(sourceNameLabel);
         newSourcePanel.getChildren().add(colorChooser);
-        /*GridPane gridPane = new GridPane();
 
-        *//*gridPane.setStyle("-fx-border-color: black; -fx-border-width: 1");
-        gridPane.setMinHeight(100);*//*
-        gridPane.setHgap(1);
-        gridPane.setVgap(1);
-
-        String[] basicColors = {
-                "#FF0000",
-                "#FF7F00",
-                "#FFFF00",
-                "#7FFF00",
-                "#00FF00",
-                "#00FF7F",
-                "#00FFFF",
-                "#007FFF",
-                "#0000FF",
-                "#7F00FF",
-                "#FF00FF",
-                "#FF007F",
-        };
-*//*        String[] basicColors = {
-                "#FF7F00",
-                "#FF0000",
-                "#FF007F",
-                "#FF00FF",
-                "#7F00FF",
-                "#0000FF",
-                "#007FFF",
-                "#00FFFF",
-                "#00FF7F",
-                "#00FF00",
-                "#7FFF00",
-                "#FFFF00"
-
-        };*//*
-        int row = 0;
-        int column = 1;
-        double alfa = 1;
-        *//*for(int i=0;i<10;i++){
-            Rectangle color = new Rectangle();
-            color.setWidth(20);
-            color.setHeight(20);
-            System.out.println("dodaje kolor");
-
-            color.setFill(Color.web(ColorConvertor.toHEXString(Color.BLACK),alfa));
-            gridPane.add(color,column,row);
-            column++;
-            alfa-=0.1;
-        }*//*
-        row=1;
-        column=0;
-        alfa = 0.1;
-        for (int i=0;i<120;i++){
-
-            Rectangle color = new Rectangle();
-            color.setWidth(20);
-            color.setHeight(20);
-            System.out.println("dodaje kolor");
-
-            color.setFill(Color.web(ColorConvertor.toHEXString(basicColors[column],alfa,Color.BLACK)));
-            gridPane.add(color,column,row);
-            column++;
-            if(column%12==0){
-                row++;
-                column = 0;
-                alfa+=0.1;
-            }
-
-        }
-        row=10;
-        column=0;
-        alfa = 1;
-        for (int i=0;i<120;i++){
-
-            Rectangle color = new Rectangle();
-            color.setWidth(20);
-            color.setHeight(20);
-            System.out.println("dodaje kolor");
-
-            color.setFill(Color.web(ColorConvertor.toHEXString(basicColors[column],alfa)));
-            gridPane.add(color,column,row);
-            column++;
-            if(column%12==0){
-                row++;
-                column = 0;
-                alfa-=0.1;
-            }
-
-        }*/
-        //viewsContainer.getChildren().add(new Button("test"));
-
-        //newSourcePanel.getChildren().add(colorPicker);
-        flowPane.setPrefWidth(100);
-        flowPane.setPrefHeight(100);
-        newSourcePanel.getChildren().add(flowPane);
         newSourcePanel.getChildren().add(textArea);
         newSourcePanel.getChildren().add(saveSourceButton);
         this.getChildren().add(newSourcePanel);
@@ -160,6 +59,7 @@ public class SourcePanel extends Panel<Source> {
         newSourcePanel.setDisable(true);
         this.disable();
 
+
         selectBox.selectedProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue) {
                 Source selectedSource = (Source) selectBox.getSelectedItem();
@@ -167,6 +67,7 @@ public class SourcePanel extends Panel<Source> {
                     sourceNameLabel.setText("Set color & description for " + selectBox.getText());
                     sourceNameLabel.setGraphic(new ImageView(new Image(iconURL)));
                     changeVisibility(startView,newSourcePanel);
+
                     FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/fxml/widgets/ImageEntry.fxml"));
                     try {
 
@@ -174,7 +75,7 @@ public class SourcePanel extends Panel<Source> {
                         imageEntry = loader.getController();
                         imageEntry.setImageEntrySize(Controller.settings.logoWidth, Controller.settings.logoHeight);
                         isImage = imageEntry.isImage;
-                        isImage.addListener(new ChangeListener<Boolean>() {
+                        /*isImage.addListener(new ChangeListener<Boolean>() {
                             @Override
                             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 
@@ -183,7 +84,7 @@ public class SourcePanel extends Panel<Source> {
                                     colorChooser.addCustomColors(colors);
                                 }
                             }
-                        });
+                        });*/
 
                     } catch (IOException e) {
                         e.printStackTrace();

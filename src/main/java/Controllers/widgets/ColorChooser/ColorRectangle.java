@@ -13,14 +13,14 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class ColorRectangle extends Rectangle {
-    private static Label target = null;
+    private static EditPane editPane = null;
 
-    public static Label getTarget() {
-        return target;
+    public static EditPane getEditPane() {
+        return editPane;
     }
 
-    public static void setTarget(Label target) {
-        ColorRectangle.target = target;
+    public static void setTarget(EditPane editPane) {
+        ColorRectangle.editPane = editPane;
     }
 
     public static int size = 20;
@@ -35,10 +35,14 @@ public class ColorRectangle extends Rectangle {
         this.color = color;
         setFill(Color.web(color));
         setCursor(Cursor.HAND);
-        setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(target!=null) target.setText(color);
+        setOnMouseClicked(event -> {
+            if(editPane!=null){
+
+                Color temp = Color.web(getColor());
+                int red = (int) (temp.getRed()*255);
+                int green = (int) (temp.getGreen()*255);
+                int blue = (int) (temp.getBlue()*255);
+                editPane.setColor(red,green,blue);
             }
         });
     }

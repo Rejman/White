@@ -4,13 +4,20 @@ import javafx.scene.paint.Color;
 
 public class ColorConvertor {
     public static final double BORDER = 0.5;
-    private static String format(double val) {
+    public static String format(double val) {
         String in = Integer.toHexString((int) Math.round(val * 255));
         return in.length() == 1 ? "0" + in : in;
     }
-
+    public static String format(int val) {
+        String in = Integer.toHexString(val);
+        return in.length() == 1 ? "0" + in : in;
+    }
     public static String toHEXString(Color value) {
         return "#" + (format(value.getRed()) + format(value.getGreen()) + format(value.getBlue()))
+                .toUpperCase();
+    }
+    public static String toHEXString(int red, int green, int blue) {
+        return "#" + (format(red) + format(green) + format(blue))
                 .toUpperCase();
     }
     public static String toHEXString(String value) {
