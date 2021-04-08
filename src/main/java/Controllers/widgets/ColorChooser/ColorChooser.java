@@ -10,9 +10,7 @@ import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -45,10 +43,10 @@ public class ColorChooser extends VBox {
         icon.setFitWidth(24);
         palette.setGraphic(icon);
 
-        StackPane stackPane = new StackPane();
+        /*StackPane stackPane = new StackPane();
 
-        stackPane.getChildren().add(buildBasicColorsPane(3));
-        palette.setContent(stackPane);
+        stackPane.getChildren().add(buildBasicColorsPane(5));*/
+        palette.setContent(buildBasicColorsPane(4));
         return palette;
     }
     private ColorField redValue = new ColorField();
@@ -61,6 +59,7 @@ public class ColorChooser extends VBox {
 
         return ColorConvertor.toHEXString(red,green,blue);
     }
+    private EditPane editPane;
     public Tab buildEditTab(){
         Tab edit = new Tab();
 
@@ -69,36 +68,11 @@ public class ColorChooser extends VBox {
         icon.setFitWidth(24);
         edit.setGraphic(icon);
 
-        /*GridPane gridPane = new GridPane();
-        gridPane.add(new Label("R"),0,0);
-        gridPane.add(redValue,1,0);
-        redValue.valueProperty().addListener((observable, oldValue, newValue) -> {
 
-            selected.setText(pullColor());
-
-        });
-        greenValue.valueProperty().addListener((observable, oldValue, newValue) -> {
-
-            selected.setText(pullColor());
-
-        });
-        blueValue.valueProperty().addListener((observable, oldValue, newValue) -> {
-
-            selected.setText(pullColor());
-
-        });
-
-        gridPane.add(new Label("G"),0,1);
-        gridPane.add(greenValue,1,1);
-
-        gridPane.add(new Label("B"),0,2);
-        gridPane.add(blueValue,1,2);
-        gridPane.setMaxWidth(300);
-        StackPane stackPane = new StackPane();
-        stackPane.getChildren().add(gridPane);*/
-        EditPane editPane = new EditPane();
+        editPane = new EditPane();
         selected = editPane.getSelected();
-        ColorRectangle.setTarget(editPane);
+        /*ColorRectangle.setTarget(editPane);*/
+        editPane.setMinHeight(300);
         edit.setContent(editPane);
         return edit;
     }
@@ -110,9 +84,9 @@ public class ColorChooser extends VBox {
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.setSide(Side.BOTTOM);
 
-
-        tabPane.getTabs().add(buildPaletteTab());
         tabPane.getTabs().add(buildEditTab());
+        tabPane.getTabs().add(buildPaletteTab());
+
 
         StackPane box = new StackPane();
         box.setStyle("-fx-background-color: black;");
@@ -140,7 +114,7 @@ public class ColorChooser extends VBox {
         int row = 0;
 
         for (int i = 0; i < colors.size(); i++) {
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString(colors.get(i)));
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString(colors.get(i)),editPane);
             gridPane.add(rect, column, row);
             column++;
             if (column % width == 0) {
@@ -150,13 +124,36 @@ public class ColorChooser extends VBox {
         }
         return gridPane;
     }
+    public String getColor(){
+        return selected.getText();
+    }
+    public void setColor(Color color){
+        if(editPane!=null){
+            editPane.setColor(color);
+        }
 
+    }
     private GridPane buildBasicColorsPane(int levels) {
         levels++;
         GridPane gridPane = new GridPane();
+        gridPane.setHgap(1);
+        gridPane.setVgap(1);
+        for(int i=0;i<=basicColors.length;i++){
 
+            ColumnConstraints column = new ColumnConstraints();
+            column.setHgrow(Priority.ALWAYS);
+            gridPane.getColumnConstraints().add(column);
+
+        }
+        for(int i=0;i<=(levels-1)*2;i++){
+
+            RowConstraints row = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            gridPane.getRowConstraints().add(row);
+
+        }
         int colorNumber = basicColors.length;
-        /*gridPane.setHgap(1);
+/*        gridPane.setHgap(1);
         gridPane.setVgap(1);*/
         int column = 0;
         int row = 0;
@@ -166,7 +163,7 @@ public class ColorChooser extends VBox {
         System.out.println("test" + alfaStep);
 
         for (int i = 0; i < levels * colorNumber; i++) {
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column], alfa, Color.BLACK));
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column], alfa, Color.BLACK),editPane);
             gridPane.add(rect, column, row);
             column++;
             if (column % colorNumber == 0) {
@@ -181,7 +178,7 @@ public class ColorChooser extends VBox {
         row--;
         alfa = 1;
         for (int i = 0; i < levels * colorNumber; i++) {
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column], alfa));
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column], alfa),editPane);
             gridPane.add(rect, column, row);
             column++;
             if (column % colorNumber == 0) {
@@ -193,25 +190,24 @@ public class ColorChooser extends VBox {
         }
         alfa = 1;
         for (int i = 0; i < levels - 1; i++) {
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString("#000000", alfa, Color.web(grey)));
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString("#000000", alfa, Color.web(grey)),editPane);
             gridPane.add(rect, colorNumber, i);
             alfa -= alfaStep;
         }
 
-        gridPane.add(new ColorRectangle(grey), colorNumber, levels - 1);
+        gridPane.add(new ColorRectangle(grey,editPane), colorNumber, levels - 1);
 
         alfa = 1;
         for (int i = (levels * 2) - 2; i > levels - 1; i--) {
             System.out.println(alfa);
-            ColorRectangle rect = new ColorRectangle(ColorConvertor.toHEXString("#FFFFFF", alfa, Color.web(grey)));
+            ColorRectangle rect = new ColorRectangle(ColorConvertor.toHEXString("#FFFFFF", alfa, Color.web(grey)),editPane);
             gridPane.add(rect, colorNumber, i);
             alfa -= alfaStep;
         }
-        gridPane.setMaxWidth(0);
-        double height = (ColorRectangle.size+1)*3*2;
-        //UWAGA UWAGA UWAGA
-        System.out.println("TUTAJ: "+height);
+        //gridPane.setMaxWidth(0);
+        int height = ((levels*2)+1)*ColorRectangle.size;
         this.setMinHeight(height);
+
         return gridPane;
     }
 

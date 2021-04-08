@@ -40,6 +40,7 @@ public class SourcePanel extends Panel<Source> {
         this.newSource = newSource;
     }
     private ColorChooser colorChooser = new ColorChooser();
+
     public SourcePanel(ModelStructure modelStructure, StackPane containerForLogo) throws IOException {
         super("Source:",new Image(iconURL), modelStructure);
         this.containerForLogo = containerForLogo;
@@ -101,7 +102,8 @@ public class SourcePanel extends Panel<Source> {
             containerForLogo.getChildren().remove(2);
             String name = selectBox.getText();
             String description = textArea.getText();
-            String color = colorPicker.getValue().toString();
+            String color = colorChooser.getColor();
+            //String color = colorPicker.getValue().toString();
 
             if (newSource != null) {
                 selectBox.getListView().getItems().remove(newSource);

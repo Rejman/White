@@ -1,5 +1,6 @@
 package Controllers.widgets.inputPanels;
 
+import Controllers.widgets.ColorChooser.ColorChooser;
 import Models.Category;
 
 import Utils.ModelStructure;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 
 public class CategoryPanel extends Panel<Category> {
     private VBox newCategoryPanel = new VBox();
-    private ColorPicker colorPicker = new ColorPicker();
+
     private Button button = new Button("Save category");
     private Label categoryName = new Label();
     private ArrayList<Category> newCategories = new ArrayList<>();
@@ -23,7 +24,7 @@ public class CategoryPanel extends Panel<Category> {
     public ArrayList<Category> getNewCategories() {
         return newCategories;
     }
-
+    private ColorChooser colorChooser = new ColorChooser();
     public CategoryPanel(ModelStructure modelStructure) {
         super("",new Image(iconURL), modelStructure);
         getStyleClass().add("category-panel");
@@ -32,7 +33,7 @@ public class CategoryPanel extends Panel<Category> {
         //setPadding(new Insets(0));
         selectBox.addData(modelStructure.getCategories());
         newCategoryPanel.getChildren().add(categoryName);
-        newCategoryPanel.getChildren().add(colorPicker);
+        newCategoryPanel.getChildren().add(colorChooser);
         newCategoryPanel.getChildren().add(button);
         //newCategoryPanel.setSpacing(5);
         this.getChildren().add(newCategoryPanel);
@@ -45,7 +46,7 @@ public class CategoryPanel extends Panel<Category> {
                     categoryName.setText("Select color for "  + selectBox.getText()+":");
                     categoryName.setGraphic(new ImageView(new Image(iconURL)));
                     changeVisibility(startView, newCategoryPanel);
-                    colorPicker.requestFocus();
+                    //colorPicker.requestFocus();
                 } else {
                     if(namePanel!=null){
                         namePanel.saveName();
@@ -57,7 +58,7 @@ public class CategoryPanel extends Panel<Category> {
         button.setOnAction(event->{
             long id = -(newCategories.size() + 1);
             String name = selectBox.getText();
-            String color = colorPicker.getValue().toString();
+            String color = colorChooser.getColor();
             Category newCategory = new Category(id, name, color);
             modelStructure.addNewCategory(newCategory);
             selectBox.setSelectedItem(newCategory);
@@ -78,7 +79,8 @@ public class CategoryPanel extends Panel<Category> {
     public void enable(){
         this.setVisible(true);
         this.setDisable(false);
-        colorPicker.setValue(Color.BLACK);
+
+        //colorPicker.setValue(Color.BLACK);
         selectBox.getSearchTextField().requestFocus();
     }
 }

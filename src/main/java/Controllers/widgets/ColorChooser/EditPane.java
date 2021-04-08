@@ -5,6 +5,7 @@ import Utils.ColorConvertor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 
 public class EditPane extends StackPane {
     private Label selected = new Label();
@@ -23,8 +24,11 @@ public class EditPane extends StackPane {
 
         return ColorConvertor.toHEXString(red,green,blue);
     }
-    public void setColor(int red, int green, int blue){
-        System.out.println(red+" "+green+" "+blue);
+    public void setColor(Color color){
+
+        int red = (int) (color.getRed()*255);
+        int green = (int) (color.getGreen()*255);
+        int blue = (int) (color.getBlue()*255);
         redValue.setValue(""+red);
         greenValue.setValue(""+green);
         blueValue.setValue(""+blue);
@@ -54,7 +58,7 @@ public class EditPane extends StackPane {
 
         gridPane.add(new Label("B"),0,2);
         gridPane.add(blueValue,1,2);
-        gridPane.setMaxWidth(300);
+        //gridPane.setMaxWidth(200);
         getChildren().add(gridPane);
     }
 }
