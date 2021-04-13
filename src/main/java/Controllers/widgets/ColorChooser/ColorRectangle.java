@@ -21,7 +21,7 @@ public class ColorRectangle extends StackPane {
     }
 
 
-    public static int size = 10;
+    public static int size = 20;
     private String color = "#FFFFFF";
 
     public String getColor() {
@@ -33,14 +33,15 @@ public class ColorRectangle extends StackPane {
 
         super();
         this.editPane = editPane;
+
         this.setMinHeight(size);
-        /*this.setMinHeight(size);
-        this.setMinWidth(size);*/
+        this.setMinWidth(size);
         this.color = color;
         //setFill(Color.web(color));
         System.out.println(color);
 
         setStyle("-fx-background-color: "+color+";");
+
         setCursor(Cursor.HAND);
         setOnMouseClicked(event -> {
             if(editPane!=null){
