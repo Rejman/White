@@ -8,20 +8,18 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
-public class ColorRectangle extends Rectangle {
-    private static Label target = null;
+public class ColorRectangle extends StackPane {
+    private EditPane editPane = null;
 
-    public static Label getTarget() {
-        return target;
+    public EditPane getEditPane() {
+        return editPane;
     }
 
-    public static void setTarget(Label target) {
-        ColorRectangle.target = target;
-    }
 
     public static int size = 20;
     private String color = "#FFFFFF";
@@ -30,15 +28,27 @@ public class ColorRectangle extends Rectangle {
         return color;
     }
 
-    public ColorRectangle(String color) {
-        super(size,size);
+    public ColorRectangle(String color, EditPane editPane) {
+        //super(size,size);
+
+        super();
+        this.editPane = editPane;
+
+        this.setMinHeight(size);
+        this.setMinWidth(size);
         this.color = color;
-        setFill(Color.web(color));
+        //setFill(Color.web(color));
+        System.out.println(color);
+
+        setStyle("-fx-background-color: "+color+";");
+
         setCursor(Cursor.HAND);
-        setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(target!=null) target.setText(color);
+        setOnMouseClicked(event -> {
+            if(editPane!=null){
+                System.out.println("Test");
+                Color temp = Color.web(getColor());
+
+                editPane.setColor(temp);
             }
         });
     }

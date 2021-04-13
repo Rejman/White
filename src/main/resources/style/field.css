@@ -45,3 +45,10 @@
     -fx-min-width: 40;
     -fx-max-width: 40;
 }
+
+.color{
+    -fx-padding: 5 5 5 5;
+    -fx-alignment: center-left;
+    -fx-min-width: 50;
+    -fx-max-width: 50;
+}

@@ -2,6 +2,7 @@ package Controllers.editPanel;
 
 import Controllers.Controller;
 
+import Controllers.widgets.ColorChooser.ColorChooser;
 import Controllers.widgets.SearchBox;
 import Models.Category;
 import Dao.CategoryDao;
@@ -36,11 +37,11 @@ public class CategoriesViewController extends Controller {
     private Button updateButton;
     @FXML
     private VBox editPanel;
-
+    private ColorChooser colorChooser = new ColorChooser();
     @FXML
     void update(ActionEvent event) {
         String newName = nameTextField.getText();
-        String newColor = colorPicker.getValue().toString();
+        String newColor = colorChooser.getColor();
         HashSet<String> forbiddenNames = modelStructure.getCategoryNames();
         boolean changed = false;
         if (!selected.getName().equals(newName)) {
@@ -65,6 +66,7 @@ public class CategoriesViewController extends Controller {
 
         searchBox.addData(modelStructure.getCategories());
         hBox.getChildren().add(0,searchBox);
+        editPanel.getChildren().add(colorChooser);
         //reaction on select model from searchBox
         searchBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
@@ -72,7 +74,8 @@ public class CategoriesViewController extends Controller {
                 updateButton.setDisable(false);
                 selected = newSelection;
                 nameTextField.setText(newSelection.getName());
-                colorPicker.setValue(Color.web(newSelection.getColor()));
+                colorChooser.setColor(Color.web(newSelection.getColor()));
+
             } else {
                 editPanel.setDisable(true);
                 //updateButton.setDisable(true);

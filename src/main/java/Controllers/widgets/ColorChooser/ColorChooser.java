@@ -1,11 +1,16 @@
 package Controllers.widgets.ColorChooser;
+
+import Controllers.widgets.ColorField;
 import Utils.ColorConvertor;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 
@@ -26,9 +31,122 @@ public class ColorChooser extends VBox {
             "#FF00FF",
             "#FF007F"
     };
-
+    private static final int lvl = 3;
+    private static final int tabPaneHeaderHeight = 53;
     private Label selected = new Label();
-    private GridPane buildCustomColorsPane(int width, ArrayList<Color> colors){
+    private ColorField redValue = new ColorField();
+    private ColorField greenValue = new ColorField();
+    private ColorField blueValue = new ColorField();
+    private EditPane editPane;
+    private TabPane tabPane = new TabPane();
+    private StackPane box = new StackPane();
+
+    public ColorChooser() {
+        //initialize
+        setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: white;");
+
+
+
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tabPane.setSide(Side.BOTTOM);
+
+        getChildren().add(box);
+
+        autoSize(60);
+
+
+        getChildren().add(tabPane);
+        EditPane editPane = new EditPane();
+        tabPane.getTabs().add(buildPaletteTab(editPane));
+        tabPane.getTabs().add(buildEditTab(editPane));
+
+        /*getTabs().add(buildEditTab());
+        getTabs().add(buildPaletteTab());
+
+
+
+        box.setStyle("-fx-background-color: black;");
+        box.getChildren().add(selected);
+        this.getChildren().add(box);
+        this.getChildren().add(tabPane);
+        this.autosize();*/
+
+/*        selected.textProperty().addListener((observable, oldValue, newValue) -> {
+            box.setStyle("-fx-background-color:" + newValue + ";");
+
+            Color contrast = ColorConvertor.getContrastColor(Color.web(newValue));
+            selected.setTextFill(contrast);
+        });*/
+
+
+    }
+
+    private void autoSize(int colorBoxHeight) {
+        int width = 13 * (1 + ColorRectangle.size);
+        box.setMinHeight(colorBoxHeight);
+        box.setMaxHeight(colorBoxHeight);
+        int height = (((lvl * 2) + 1) * (1 + ColorRectangle.size) + colorBoxHeight) + tabPaneHeaderHeight;
+        this.setMinWidth(width);
+        this.setMaxWidth(width);
+        this.setMinHeight(height);
+        this.setMaxHeight(height);
+    }
+
+    private StackPane buildColorBox() {
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().add(selected);
+        stackPane.setStyle("-fx-background-color: red;");
+        selected.textProperty().addListener((observable, oldValue, newValue) -> {
+            stackPane.setStyle("-fx-background-color:" + newValue + ";");
+
+            Color contrast = ColorConvertor.getContrastColor(Color.web(newValue));
+            selected.setTextFill(contrast);
+        });
+        return stackPane;
+    }
+
+    public Tab buildPaletteTab(EditPane editPane) {
+        Tab tab = new Tab("Palette");
+/*        ImageView icon = new ImageView(new Image("icons/paint-palette-24.png"));
+        icon.setFitHeight(24);
+        icon.setFitWidth(24);
+        tab.setGraphic(icon);*/
+
+        tab.setContent(buildBasicColorsPane(lvl, editPane));
+        return tab;
+    }
+
+    public String pullColor() {
+        int red = Integer.parseInt(redValue.getValue());
+        int green = Integer.parseInt(greenValue.getValue());
+        int blue = Integer.parseInt(blueValue.getValue());
+
+        return ColorConvertor.toHEXString(red, green, blue);
+    }
+
+    public Tab buildEditTab(EditPane editPane) {
+
+        Tab tab = new Tab("Edit");
+/*        ImageView icon = new ImageView(new Image("icons/tune-48.png"));
+        icon.setFitHeight(24);
+        icon.setFitWidth(24);
+        tab.setGraphic(icon);*/
+
+        selected = editPane.getSelected();
+        box.getChildren().add(selected);
+        //box.setStyle("-fx-background-color: red;");
+        selected.textProperty().addListener((observable, oldValue, newValue) -> {
+            box.setStyle("-fx-background-color:" + newValue + ";");
+
+            Color contrast = ColorConvertor.getContrastColor(Color.web(newValue));
+            selected.setTextFill(contrast);
+        });
+
+        tab.setContent(editPane);
+        return tab;
+    }
+
+    private GridPane buildCustomColorsPane(int width, ArrayList<Color> colors) {
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(1);
@@ -36,105 +154,96 @@ public class ColorChooser extends VBox {
         int column = 0;
         int row = 0;
 
-        for(int i=0;i<colors.size();i++){
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString(colors.get(i)));
-            gridPane.add(rect,column,row);
+        for (int i = 0; i < colors.size(); i++) {
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString(colors.get(i)), editPane);
+            gridPane.add(rect, column, row);
             column++;
-            if(column%width==0){
+            if (column % width == 0) {
                 row++;
                 column = 0;
             }
         }
         return gridPane;
     }
-    private GridPane buildBasicColorsPane(int levels){
+
+    public String getColor() {
+        return selected.getText();
+    }
+
+    public void setColor(Color color) {
+        if (editPane != null) {
+            editPane.setColor(color);
+        }
+
+    }
+
+    private GridPane buildBasicColorsPane(int levels, EditPane editPane) {
+
         levels++;
         GridPane gridPane = new GridPane();
-        int colorNumber = basicColors.length;
+        gridPane.setStyle("-fx-background-color: white;");
+        gridPane.setPadding(new Insets(1,0,0,0));
         gridPane.setHgap(1);
         gridPane.setVgap(1);
+
+        int colorNumber = basicColors.length;
+
         int column = 0;
         int row = 0;
 
-        double alfaStep = (1/(double)levels);
+        double alfaStep = (1 / (double) levels);
         double alfa = alfaStep;
-        System.out.println("test"+alfaStep);
+        System.out.println("test" + alfaStep);
 
-        for(int i=0;i<levels*colorNumber;i++){
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column],alfa,Color.BLACK));
-            gridPane.add(rect,column,row);
+        for (int i = 0; i < levels * colorNumber; i++) {
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column], alfa, Color.BLACK), editPane);
+            gridPane.add(rect, column, row);
             column++;
-            if(column%colorNumber==0){
+            if (column % colorNumber == 0) {
                 row++;
                 column = 0;
-                alfa+=alfaStep;
+                alfa += alfaStep;
             }
-            if(alfa>1) alfa = 1;
+            if (alfa > 1) alfa = 1;
         }
 
-        column=0;
+        column = 0;
         row--;
         alfa = 1;
-        for(int i=0;i<levels*colorNumber;i++){
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column],alfa));
-            gridPane.add(rect,column,row);
+        for (int i = 0; i < levels * colorNumber; i++) {
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString(basicColors[column], alfa), editPane);
+            gridPane.add(rect, column, row);
             column++;
-            if(column%colorNumber==0){
+            if (column % colorNumber == 0) {
                 row++;
                 column = 0;
-                alfa-=alfaStep;
+                alfa -= alfaStep;
             }
-            if(alfa<0) alfa = 0;
+            if (alfa < 0) alfa = 0;
         }
         alfa = 1;
-        for(int i=0;i<levels-1;i++){
-            Rectangle rect = new ColorRectangle(ColorConvertor.toHEXString("#000000",alfa,Color.web(grey)));
-            gridPane.add(rect,colorNumber,i);
-            alfa-=alfaStep;
+        for (int i = 0; i < levels - 1; i++) {
+            StackPane rect = new ColorRectangle(ColorConvertor.toHEXString("#000000", alfa, Color.web(grey)), editPane);
+            gridPane.add(rect, colorNumber, i);
+            alfa -= alfaStep;
         }
 
-        gridPane.add(new ColorRectangle(grey),colorNumber,levels-1);
+        gridPane.add(new ColorRectangle(grey, editPane), colorNumber, levels - 1);
 
         alfa = 1;
-        for(int i=(levels*2)-2;i>levels-1;i--){
+        for (int i = (levels * 2) - 2; i > levels - 1; i--) {
             System.out.println(alfa);
-            ColorRectangle rect = new ColorRectangle(ColorConvertor.toHEXString("#FFFFFF",alfa, Color.web(grey)));
-            gridPane.add(rect,colorNumber,i);
-            alfa-=alfaStep;
+            ColorRectangle rect = new ColorRectangle(ColorConvertor.toHEXString("#FFFFFF", alfa, Color.web(grey)), editPane);
+            gridPane.add(rect, colorNumber, i);
+            alfa -= alfaStep;
         }
+
         return gridPane;
     }
-    public void addCustomColors(ArrayList<Color> colors){
-        System.out.println("okey");
-        GridPane customColors = buildCustomColorsPane(5,colors);
+
+    public void addCustomColors(ArrayList<Color> colors) {
+
+        GridPane customColors = buildCustomColorsPane(5, colors);
         getChildren().add(customColors);
-    }
-    public ColorChooser() {
-
-        //setStyle("-fx-border-color: black; -fx-border-width: 2");
-        VBox rightBox = new VBox();
-        StackPane box = new StackPane();
-        box.setMinWidth(100);
-        box.setMinHeight(100);
-        box.setStyle("-fx-background-color: black;");
-        //selected.setMaxWidth(100);
-        box.setMaxHeight(100);
-        box.getChildren().add(selected);
-        VBox.setVgrow(box,Priority.ALWAYS);
-        HBox.setHgrow(rightBox,Priority.ALWAYS);
-        rightBox.getChildren().add(box);
-
-        selected.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                box.setStyle("-fx-background-color:"+newValue+";");
-                Color contrast = ColorConvertor.getContrastColor(Color.web(newValue));
-                selected.setTextFill(contrast);
-            }
-        });
-        ColorRectangle.setTarget(selected);
-        GridPane basicColors = buildBasicColorsPane(6);
-        getChildren().add(basicColors);
-        getChildren().add(rightBox);
     }
 }

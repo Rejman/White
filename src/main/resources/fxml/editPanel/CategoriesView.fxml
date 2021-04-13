@@ -12,10 +12,10 @@
    <children>
       <HBox fx:id="hBox">
          <children>
-            <VBox fx:id="editPanel" alignment="TOP_RIGHT" disable="true" spacing="5.0">
+            <VBox fx:id="editPanel" alignment="TOP_RIGHT" disable="true" spacing="5.0" HBox.hgrow="ALWAYS">
                <children>
-                  <TextField fx:id="nameTextField" promptText="name" />
-                  <ColorPicker fx:id="colorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" />
+                  <TextField fx:id="nameTextField" promptText="name" VBox.vgrow="ALWAYS" />
+                  <ColorPicker fx:id="colorPicker" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" VBox.vgrow="ALWAYS" />
                   <Button fx:id="updateButton" disable="true" mnemonicParsing="false" onAction="#update" text="Save" />
                </children>
                <HBox.margin>
