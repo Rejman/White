@@ -56,7 +56,7 @@ public class UnitDao implements ModelDao<Unit> {
             return true;
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            //throwables.printStackTrace();
             return false;
         }
     }

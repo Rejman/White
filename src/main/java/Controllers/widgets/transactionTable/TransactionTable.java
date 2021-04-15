@@ -66,14 +66,27 @@ public class TransactionTable extends TableView<TransactionItem> {
                             Tag tag = transaction.getTag();
 
                             if (Controller.daoContainer.getTransactionDao().delete(row.getTransaction())) {
-                                Controller.modelStructure.deleteTag(tag,true);
+                                if(tag!=null){
+                                    if(Controller.modelStructure.deleteTag(tag,true)){
+                                        System.out.println("usuwam tag: "+tag);
+                                    }
+                                }
 
-                                Controller.modelStructure.deleteSource(source, true);
+
+                                if(Controller.modelStructure.deleteSource(source, true)){
+                                    System.out.println("usuwam source: "+source);
+                                }
 
                                 if (Controller.modelStructure.deleteExpense(expense, true)) {
-                                    Controller.modelStructure.deleteUnit(unit, true);
+                                    System.out.println("usuwam expense: "+expense);
+                                    if(Controller.modelStructure.deleteUnit(unit, true)){
+                                        System.out.println("usuwam unit: "+unit);
+                                    }
                                     if (Controller.modelStructure.deleteName(name, true)) {
-                                        Controller.modelStructure.deleteCategory(category, true);
+                                        System.out.println("usuwam name: "+name);
+                                        if(Controller.modelStructure.deleteCategory(category, true)){
+                                            System.out.println("usuwam category: "+category);
+                                        }
                                     }
                                 }
                                 HistoryPosition.selected.getTransactions().remove(row.getTransaction());
