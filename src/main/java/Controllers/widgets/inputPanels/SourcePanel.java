@@ -72,10 +72,13 @@ public class SourcePanel extends Panel<Source> {
                     FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/fxml/widgets/ImageEntry.fxml"));
                     try {
 
-                        containerForLogo.getChildren().add(2,loader.load());
-                        imageEntry = loader.getController();
-                        imageEntry.setImageEntrySize(Controller.settings.logoWidth, Controller.settings.logoHeight);
-                        isImage = imageEntry.isImage;
+                        if(containerForLogo!=null){
+                            containerForLogo.getChildren().add(2,loader.load());
+                            imageEntry = loader.getController();
+                            imageEntry.setImageEntrySize(Controller.settings.logoWidth, Controller.settings.logoHeight);
+                            isImage = imageEntry.isImage;
+                        }
+
                         /*isImage.addListener(new ChangeListener<Boolean>() {
                             @Override
                             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -92,14 +95,15 @@ public class SourcePanel extends Panel<Source> {
                     }
                     saveSourceButton.requestFocus();
                 } else {
-                    externalLabel.setText(selectedSource.getName());
+                    if(externalLabel!=null) externalLabel.setText(selectedSource.getName());
                     showNextPanel();
                 }
             }
         }));
 
         saveSourceButton.setOnAction(event -> {
-            containerForLogo.getChildren().remove(2);
+            if(containerForLogo!=null) containerForLogo.getChildren().remove(2);
+
             String name = selectBox.getText();
             String description = textArea.getText();
             String color = colorChooser.getColor();

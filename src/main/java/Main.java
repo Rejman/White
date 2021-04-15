@@ -38,6 +38,7 @@ public class Main extends Application {
         loadStyle(scene, STYLE_PATHS);
         primaryStage.setScene(scene);
         TransactionTable.getTagScene().getStylesheets().add(Main.class.getResource("style/search-box.css").toExternalForm());
+        TransactionTable.getSourceScene().getStylesheets().add(Main.class.getResource("style/input-panel.css").toExternalForm());
 
         mainController.setPrimaryStage(primaryStage);
         primaryStage.show();

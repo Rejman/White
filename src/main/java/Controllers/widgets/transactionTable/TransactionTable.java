@@ -27,14 +27,19 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class TransactionTable extends TableView<TransactionItem> {
     private static StackPane tagPane = new StackPane();
+    private static StackPane sourcePane = new StackPane();
     private static Scene tagScene = new Scene(tagPane);
-    private Stage tagStage = new Stage();
+    private static Scene sourceScene = new Scene(sourcePane);
+    private Stage innerStage = new Stage();
     protected IntegerProperty selectedNumber = new SimpleIntegerProperty(0);
     private SelectBox<Tag> selectTagBox = new SelectBox<>();
 
@@ -222,7 +227,7 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
-
+    private SourcePanel sourcePanel = null;
     public TransactionTable() {
         getStyleClass().add("transactionTable");
         setFocusTraversable(false);
@@ -232,14 +237,34 @@ public class TransactionTable extends TableView<TransactionItem> {
         getColumns().addAll(columns);
 
         constructRows();
+        sourcePanel = null;
+        try {
+            System.out.println("udało się");
+            sourcePanel = new SourcePanel(Controller.modelStructure,null);
+            //sourcePanel.setNextPanel(sourcePanel);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         contextMenu = buildContextMenu();
         selectTagBox = buildSelectTagBox();
+        tagPane.getChildren().add(selectTagBox);
+        sourcePane.getChildren().add(sourcePanel);
+        innerStage.initModality(Modality.WINDOW_MODAL);
+
+        innerStage.initOwner(MainController.getPrimaryStage().getScene().getWindow());
+        innerStage.initStyle(StageStyle.UTILITY);
+        //innerStage.initOwner(innerStage.getScene().getWindow());
+
 
     }
 
     public static Scene getTagScene() {
         return tagScene;
+    }
+
+    public static Scene getSourceScene() {
+        return sourceScene;
     }
 
     private ContextMenu buildContextMenu() {
@@ -313,6 +338,12 @@ public class TransactionTable extends TableView<TransactionItem> {
             @Override
             public void handle(ActionEvent event) {
                 showTagWindow();
+            }
+        });
+        editSource.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showSourceWindow();
             }
         });
         selectAll.setOnAction(new EventHandler<ActionEvent>() {
@@ -477,18 +508,18 @@ public class TransactionTable extends TableView<TransactionItem> {
 
                     unselectAll();
                 }
-                tagStage.close();
+                innerStage.close();
                 this.refresh();
             }
         }));
         //
-        tagStage.setTitle("Set tag for selected transaction");
-        tagStage.setScene(tagScene);
-        tagPane.getChildren().add(selectTagBox);
-        tagStage.initModality(Modality.APPLICATION_MODAL);
+/*        tagStage.setTitle("Set tag for selected transaction");
+        tagStage.setScene(tagScene);*/
+        /*tagPane.getChildren().add(selectTagBox);*/
+       /* tagStage.initModality(Modality.APPLICATION_MODAL);
 
         Stage primaryStage = MainController.getPrimaryStage();
-        tagStage.initOwner(primaryStage);
+        tagStage.initOwner(primaryStage);*/
         return selectTagBox;
     }
 
@@ -549,15 +580,27 @@ public class TransactionTable extends TableView<TransactionItem> {
     }
 
     void showTagWindow() {
-        tagStage = new Stage();
+        innerStage = new Stage();
         //!!!
 
         selectTagBox.addData(Controller.modelStructure.getTags());
-        tagStage.setTitle("Set tag for selected transaction");
+        innerStage.setTitle("Set tag for selected transaction");
 
-        tagStage.setScene(tagScene);
+        innerStage.setScene(tagScene);
 
-        tagStage.show();
+        innerStage.show();
+
+    }
+    void showSourceWindow() {
+        innerStage = new Stage();
+        //!!!
+
+        //selectTagBox.addData(Controller.modelStructure.getTags());
+        innerStage.setTitle("Set tag for selected transaction");
+        sourcePanel.enable();
+        innerStage.setScene(sourceScene);
+
+        innerStage.show();
 
     }
 
