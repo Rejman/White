@@ -35,7 +35,7 @@ public class TransactionTable extends TableView<TransactionItem> {
     private static StackPane tagPane = new StackPane();
     private static Scene tagScene = new Scene(tagPane);
     private Stage tagStage = new Stage();
-    private IntegerProperty selectedNumber = new SimpleIntegerProperty(0);
+    protected IntegerProperty selectedNumber = new SimpleIntegerProperty(0);
     private SelectBox<Tag> selectTagBox = new SelectBox<>();
 
     private ContextMenu contextMenu;
@@ -275,7 +275,7 @@ public class TransactionTable extends TableView<TransactionItem> {
         contextMenu.getItems().add(select);
         contextMenu.getItems().add(delete);
         contextMenu.getItems().add(new SeparatorMenuItem());
-        contextMenu.getItems().add(edit);
+        if(getClass().equals(TransactionTable.class)) contextMenu.getItems().add(edit);
         contextMenu.getItems().add(tag);
 
         setContextMenu(contextMenu);
@@ -537,11 +537,13 @@ public class TransactionTable extends TableView<TransactionItem> {
     }
 
     void deleteSelected() {
+        selectedNumber.setValue(0);
         deleteSelected.reset();
         deleteSelected.start();
     }
 
     void deleteTag() {
+        selectedNumber.setValue(0);
         deleteTag.reset();
         deleteTag.start();
     }

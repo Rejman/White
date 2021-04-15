@@ -14,6 +14,7 @@ public class ReciptTable extends TransactionTable{
     }
 
     void deleteSelected(){
+        selectedNumber.setValue(0);
         ObservableList<TransactionItem> items = getItems();
         ArrayList<TransactionItem> rows = new ArrayList<>(items);
 
@@ -29,6 +30,7 @@ public class ReciptTable extends TransactionTable{
         refresh();
     }
     void deleteTag(){
+        selectedNumber.setValue(0);
         ObservableList<TransactionItem> items = getItems();
         ArrayList<TransactionItem> rows = new ArrayList<>(items);
 
@@ -41,6 +43,7 @@ public class ReciptTable extends TransactionTable{
         refresh();
     }
     void setTag(){
+        selectedNumber.setValue(0);
         ObservableList<TransactionItem> items = getItems();
         ArrayList<TransactionItem> rows = new ArrayList<>(items);
 
