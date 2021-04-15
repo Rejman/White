@@ -11,10 +11,7 @@ public class CategoryDao implements ModelDao<Category> {
     public static final String UPDATE_SQL = "UPDATE categories SET name=?, color=? WHERE id=?";
     public static final String SELECT_SQL = "SELECT n.id AS name_id, n.name AS name_name, c.id AS category_id, c.name AS category_name, c.color AS category_color FROM names n INNER JOIN categories c ON c.id=n.category_id";
     public static final String DELETE_SQL = "DELETE FROM categories WHERE id=?;";
-    private String url;
-    public CategoryDao(String url) {
-        this.url = url;
-    }
+
 
     @Override
     public Category insert(Category model, Connection conn) throws SQLException {
@@ -30,7 +27,7 @@ public class CategoryDao implements ModelDao<Category> {
     @Override
     public Category insertOne(Category model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             insert(model,conn);
             conn.close();
             return model;
@@ -46,7 +43,7 @@ public class CategoryDao implements ModelDao<Category> {
         Properties properties = new Properties();
         properties.setProperty("PRAGMA foreign_keys", "ON");
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url,properties);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl(),properties);
             Dao.enableForeignKeys(conn);
             PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
             ps.setLong(1,model.getId());
@@ -63,7 +60,7 @@ public class CategoryDao implements ModelDao<Category> {
     @Override
     public void update(Category model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
             ps.setString(1,model.getName());
             ps.setString(2,model.getColor());
@@ -79,7 +76,7 @@ public class CategoryDao implements ModelDao<Category> {
     public HashSet<Category> selectAll() {
         HashSet<Category> categories = new HashSet<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(SELECT_SQL);
             while(rs.next()) {

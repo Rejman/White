@@ -58,7 +58,7 @@ public class SourcesViewController extends Controller {
             changed = true;
         }
         if (changed) {
-            SourceDao sourceDao = new SourceDao(daoContainer.getDataBaseUrl());
+            SourceDao sourceDao = new SourceDao();
             sourceDao.update(selected);
             searchBox.refresh();
         }

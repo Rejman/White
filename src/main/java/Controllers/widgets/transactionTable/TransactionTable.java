@@ -66,21 +66,26 @@ public class TransactionTable extends TableView<TransactionItem> {
                             Tag tag = transaction.getTag();
 
                             if (Controller.daoContainer.getTransactionDao().delete(row.getTransaction())) {
-                                if (Controller.daoContainer.getTagDao().delete(tag)) {
-                                    Controller.modelStructure.deleteTag(tag);
-                                }
-                                if (Controller.daoContainer.getSourceDao().delete(source)) {
-                                    Controller.modelStructure.deleteSource(source);
-                                }
-                                if (Controller.daoContainer.getExpenseDao().delete(expense)) {
-                                    Controller.modelStructure.deleteExpense(expense);
-                                    if (Controller.daoContainer.getUnitDao().delete(unit)) {
-                                        Controller.modelStructure.deleteUnit(unit);
+                                if(tag!=null){
+                                    if(Controller.modelStructure.deleteTag(tag,true)){
+                                        System.out.println("usuwam tag: "+tag);
                                     }
-                                    if (Controller.daoContainer.getNameDao().delete(name)) {
-                                        Controller.modelStructure.deleteName(name);
-                                        if (Controller.daoContainer.getCategoryDao().delete(category)) {
-                                            Controller.modelStructure.deleteCategory(category);
+                                }
+
+
+                                if(Controller.modelStructure.deleteSource(source, true)){
+                                    System.out.println("usuwam source: "+source);
+                                }
+
+                                if (Controller.modelStructure.deleteExpense(expense, true)) {
+                                    System.out.println("usuwam expense: "+expense);
+                                    if(Controller.modelStructure.deleteUnit(unit, true)){
+                                        System.out.println("usuwam unit: "+unit);
+                                    }
+                                    if (Controller.modelStructure.deleteName(name, true)) {
+                                        System.out.println("usuwam name: "+name);
+                                        if(Controller.modelStructure.deleteCategory(category, true)){
+                                            System.out.println("usuwam category: "+category);
                                         }
                                     }
                                 }
@@ -132,11 +137,7 @@ public class TransactionTable extends TableView<TransactionItem> {
                                 System.out.println(tag+" - "+tag.getId());
                                 Controller.daoContainer.getTransactionDao().setTag(transaction,null);
                                 System.out.println("usnięto tag: "+tag);
-                                if(Controller.daoContainer.getTagDao().delete(tag)){
-                                    System.out.println(" bezpowrotnie");
-                                    Controller.modelStructure.deleteTag(tag);
-
-                                }
+                                Controller.modelStructure.deleteTag(tag,true);
 
                             }
                             row.setTag(null);
@@ -187,10 +188,7 @@ public class TransactionTable extends TableView<TransactionItem> {
                                 long oldTagId = tag.getId();
                                 Tag oldTag = new Tag(oldTagId,"");
                                 Controller.daoContainer.getTransactionDao().setTag(transaction,null);
-                                if(Controller.daoContainer.getTagDao().delete(oldTag)){
-                                    System.out.println(" bezpowrotnie");
-                                    Controller.modelStructure.deleteTag(oldTag);
-                                }
+                                Controller.modelStructure.deleteTag(oldTag,true);
                             }
                             System.out.println(Controller.modelStructure.getTags());
                             Tag newTag = (Tag) selectTagBox.getSelectedItem();

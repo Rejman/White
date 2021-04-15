@@ -15,11 +15,6 @@ public class ExpenseDao implements ModelDao<Expense> {
     public static final String SELECT_SQL = "SELECT e.id AS expense_id, n.id AS name_id, n.name as name_name, c.id AS category_id, c.name AS category_name, c.color AS category_color, u.id AS unit_id, u.name AS unit_name, u.shortcut AS unit_shortcut, u.real_number AS real_number FROM expenses e INNER JOIN names n ON n.id=e.name_id INNER JOIN categories c ON c.id=n.category_id INNER JOIN units u ON u.id=e.unit_id";
     public static final String DELETE_SQL = "DELETE FROM expenses WHERE id=?;";
 
-    private String url;
-    public ExpenseDao(String url) {
-        this.url = url;
-    }
-
     @Override
     public Expense insert(Expense model, Connection conn) throws SQLException {
         PreparedStatement ps = conn.prepareStatement(INSERT_SQL);
@@ -34,7 +29,7 @@ public class ExpenseDao implements ModelDao<Expense> {
     @Override
     public Expense insertOne(Expense model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             insert(model,conn);
             conn.close();
             return model;
@@ -50,7 +45,7 @@ public class ExpenseDao implements ModelDao<Expense> {
         Properties properties = new Properties();
         properties.setProperty("PRAGMA foreign_keys", "ON");
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url,properties);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl(),properties);
             Dao.enableForeignKeys(conn);
             PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
             ps.setLong(1,model.getId());
@@ -67,7 +62,7 @@ public class ExpenseDao implements ModelDao<Expense> {
     @Override
     public void update(Expense model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
             ps.setLong(1,model.getName().getId());
             ps.setLong(2,model.getUnit().getId());
@@ -83,7 +78,7 @@ public class ExpenseDao implements ModelDao<Expense> {
     public HashSet<Expense> selectAll() {
         HashSet<Expense> expenses = new HashSet<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(SELECT_SQL);
             while(rs.next()) {

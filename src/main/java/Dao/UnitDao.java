@@ -12,10 +12,7 @@ public class UnitDao implements ModelDao<Unit> {
     public static final String UPDATE_SQL = "UPDATE units SET name=?, shortcut=?, real_number=? WHERE id=?";
     public static final String SELECT_SQL = "SELECT * FROM units;";
     public static final String DELETE_SQL = "DELETE FROM units WHERE id=?;";
-    private String url;
-    public UnitDao(String url) {
-        this.url = url;
-    }
+
 
     @Override
     public Unit insert(Unit model, Connection conn) throws SQLException {
@@ -34,7 +31,7 @@ public class UnitDao implements ModelDao<Unit> {
     @Override
     public Unit insertOne(Unit model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             insert(model,conn);
             conn.close();
             return model;
@@ -50,7 +47,7 @@ public class UnitDao implements ModelDao<Unit> {
         Properties properties = new Properties();
         properties.setProperty("PRAGMA foreign_keys", "ON");
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url,properties);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl(),properties);
             Dao.enableForeignKeys(conn);
             PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
             ps.setLong(1,model.getId());
@@ -59,7 +56,7 @@ public class UnitDao implements ModelDao<Unit> {
             return true;
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            //throwables.printStackTrace();
             return false;
         }
     }
@@ -67,7 +64,7 @@ public class UnitDao implements ModelDao<Unit> {
     @Override
     public void update(Unit model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
             ps.setString(1,model.getName());
             ps.setString(2,model.getShortcut());
@@ -86,7 +83,7 @@ public class UnitDao implements ModelDao<Unit> {
     public HashSet<Unit> selectAll() {
         HashSet<Unit> units = new HashSet<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(SELECT_SQL);
             while(rs.next()) {

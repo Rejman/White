@@ -11,12 +11,6 @@ public class SourceDao implements ModelDao<Source> {
     public static final String SELECT_SQL = "SELECT * FROM sources;";
     public static final String DELETE_SQL = "DELETE FROM sources WHERE id=?;";
 
-    private String dataBaseUrl;
-
-    public SourceDao(String url) {
-        this.dataBaseUrl = url;
-    }
-
     @Override
     // insert to database & return with new id
     // can by use for many object in loop
@@ -36,7 +30,7 @@ public class SourceDao implements ModelDao<Source> {
     // insert one object to database & close connection
     public Source insertOne(Source model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataBaseUrl);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             insert(model, conn);
             conn.close();
             return model;
@@ -52,7 +46,7 @@ public class SourceDao implements ModelDao<Source> {
     public boolean delete(Source model) {
 
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataBaseUrl, Dao.getPropertiesWithForeignKeys());
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl(), Dao.getPropertiesWithForeignKeys());
             Dao.enableForeignKeys(conn);
             PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
             ps.setLong(1, model.getId());
@@ -69,7 +63,7 @@ public class SourceDao implements ModelDao<Source> {
     @Override
     public void update(Source model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataBaseUrl);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
             ps.setString(1, model.getName());
             ps.setString(2, model.getDescription());
@@ -86,7 +80,7 @@ public class SourceDao implements ModelDao<Source> {
     public HashSet<Source> selectAll() {
         HashSet<Source> sources = new HashSet<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataBaseUrl);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(SELECT_SQL);
             while (rs.next()) {

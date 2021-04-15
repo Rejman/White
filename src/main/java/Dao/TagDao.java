@@ -11,11 +11,7 @@ public class TagDao implements ModelDao<Tag> {
     public static final String UPDATE_SQL = "UPDATE tags SET name=? WHERE id=?";
     public static final String SELECT_SQL = "SELECT id, name FROM tags;";
     public static final String DELETE_SQL = "DELETE FROM tags WHERE id=?;";
-    private String url;
 
-    public TagDao(String url) {
-        this.url = url;
-    }
 
     @Override
     public Tag insert(Tag model, Connection conn) throws SQLException {
@@ -30,7 +26,7 @@ public class TagDao implements ModelDao<Tag> {
     @Override
     public Tag insertOne(Tag model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             insert(model, conn);
             conn.close();
             return model;
@@ -44,7 +40,7 @@ public class TagDao implements ModelDao<Tag> {
     @Override
     public boolean delete(Tag model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url, Dao.getPropertiesWithForeignKeys());
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl(), Dao.getPropertiesWithForeignKeys());
             Dao.enableForeignKeys(conn);
             PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
             ps.setLong(1, model.getId());
@@ -67,7 +63,7 @@ public class TagDao implements ModelDao<Tag> {
     public HashSet<Tag> selectAll() {
         HashSet<Tag> tags = new HashSet<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(SELECT_SQL);
             while (rs.next()) {
