@@ -1,7 +1,9 @@
 package Utils;
 
+import Dao.DaoContainer;
 import Models.*;
 
+import java.sql.Connection;
 import java.util.HashSet;
 import java.util.SortedMap;
 
@@ -10,6 +12,8 @@ public class ModelStructure {
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
+
+    private DaoContainer daoContainer;
 
     private HashSet<Expense> expenses;
     private HashSet<Source> sources;
@@ -25,7 +29,12 @@ public class ModelStructure {
     private HashSet<String> categoryNames = new HashSet<>();
     private HashSet<String> tagNames = new HashSet<>();
 
-    public ModelStructure(HashSet<Expense> expenses, HashSet<Source> sources, HashSet<Tag> tags) {
+    public DaoContainer getDaoContainer() {
+        return daoContainer;
+    }
+
+    public ModelStructure(DaoContainer daoContainer, HashSet<Expense> expenses, HashSet<Source> sources, HashSet<Tag> tags) {
+        this.daoContainer = daoContainer;
         for (Tag tag : tags
         ) {
             tagNames.add(tag.getName());
@@ -126,29 +135,73 @@ public class ModelStructure {
         categoryNames.add(category.getName());
     }
 
-    public void deleteTag(Tag tag) {
-        tags.remove(tag);
-        tagNames.remove(tag.getName());
+    public boolean deleteTag(Tag tag, boolean permanently) {
+        boolean delete = true;
+        if(permanently){
+            delete = daoContainer.getTagDao().delete(tag);
+        }
+        if(delete){
+            delete = tags.remove(tag);
+            tagNames.remove(tag.getName());
+        }
+        return delete;
     }
-    public void deleteCategory(Category category) {
-        categories.remove(category);
-        System.out.println("czy usnieęto nazwe kategori? :"+categoryNames.remove(category.getName()));
+    public boolean deleteCategory(Category category, boolean permanently) {
+        boolean delete = true;
+        if(permanently){
+            delete = daoContainer.getCategoryDao().delete(category);
+        }
+        if(delete){
+            delete = categories.remove(category);
+            categoryNames.remove(category.getName());
+        }
+        return delete;
     }
-    public void deleteExpense(Expense expense) {
-        expenses.remove(expense);
+    public boolean deleteExpense(Expense expense, boolean permanently) {
+        boolean delete = true;
+        if(permanently){
+            delete = daoContainer.getExpenseDao().delete(expense);
+        }
+        if(delete){
+            delete = expenses.remove(expense);
+        }
+        return delete;
     }
-    public void deleteSource(Source source) {
-        sources.remove(source);
-        sourceNames.remove(source.getName());
+    public boolean deleteSource(Source source, boolean permanently) {
+        boolean delete = true;
+        if(permanently){
+            delete = daoContainer.getSourceDao().delete(source);
+        }
+        if(delete){
+            delete = sources.remove(source);
+            sourceNames.remove(source.getName());
+        }
+        return delete;
+
     }
-    public void deleteName(Name name) {
-        names.remove(name);
-        expenseNames.remove(name.getName());
+    public boolean deleteName(Name name, boolean permanently) {
+        boolean delete = true;
+        if(permanently){
+            delete = daoContainer.getNameDao().delete(name);
+        }
+        if(delete){
+            delete = names.remove(name);
+            expenseNames.remove(name.getName());
+        }
+        return delete;
+
     }
-    public void deleteUnit(Unit unit) {
-        units.remove(unit);
-        unitShortcuts.remove(unit.getShortcut());
-        unitNames.remove(unit.getName());
+    public boolean deleteUnit(Unit unit, boolean permanently) {
+        boolean delete = true;
+        if(permanently){
+            delete = daoContainer.getUnitDao().delete(unit);
+        }
+        if(delete){
+            delete = units.remove(unit);
+            unitShortcuts.remove(unit.getShortcut());
+            unitNames.remove(unit.getName());
+        }
+        return delete;
     }
 
     public void replaceNewSource(Source source) {

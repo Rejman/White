@@ -65,7 +65,6 @@ public class MainController extends Controller {
         System.exit(0);
     }
 
-
     private Service loadData = new Service() {
         @Override
         protected Task createTask() {
@@ -76,7 +75,8 @@ public class MainController extends Controller {
                     HashSet<Source> sources = daoContainer.getSourceDao().selectAll();
                     HashSet<Expense> expenses = daoContainer.getExpenseDao().selectAll();
                     HashSet<Tag> tags = daoContainer.getTagDao().selectAll();
-                    modelStructure = new ModelStructure(expenses, sources, tags);
+
+                    modelStructure = new ModelStructure(daoContainer, expenses, sources, tags);
                     return null;
                 }
 

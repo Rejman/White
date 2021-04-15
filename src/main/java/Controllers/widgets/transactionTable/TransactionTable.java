@@ -66,22 +66,14 @@ public class TransactionTable extends TableView<TransactionItem> {
                             Tag tag = transaction.getTag();
 
                             if (Controller.daoContainer.getTransactionDao().delete(row.getTransaction())) {
-                                if (Controller.daoContainer.getTagDao().delete(tag)) {
-                                    Controller.modelStructure.deleteTag(tag);
-                                }
-                                if (Controller.daoContainer.getSourceDao().delete(source)) {
-                                    Controller.modelStructure.deleteSource(source);
-                                }
-                                if (Controller.daoContainer.getExpenseDao().delete(expense)) {
-                                    Controller.modelStructure.deleteExpense(expense);
-                                    if (Controller.daoContainer.getUnitDao().delete(unit)) {
-                                        Controller.modelStructure.deleteUnit(unit);
-                                    }
-                                    if (Controller.daoContainer.getNameDao().delete(name)) {
-                                        Controller.modelStructure.deleteName(name);
-                                        if (Controller.daoContainer.getCategoryDao().delete(category)) {
-                                            Controller.modelStructure.deleteCategory(category);
-                                        }
+                                Controller.modelStructure.deleteTag(tag,true);
+
+                                Controller.modelStructure.deleteSource(source, true);
+
+                                if (Controller.modelStructure.deleteExpense(expense, true)) {
+                                    Controller.modelStructure.deleteUnit(unit, true);
+                                    if (Controller.modelStructure.deleteName(name, true)) {
+                                        Controller.modelStructure.deleteCategory(category, true);
                                     }
                                 }
                                 HistoryPosition.selected.getTransactions().remove(row.getTransaction());
@@ -132,11 +124,7 @@ public class TransactionTable extends TableView<TransactionItem> {
                                 System.out.println(tag+" - "+tag.getId());
                                 Controller.daoContainer.getTransactionDao().setTag(transaction,null);
                                 System.out.println("usnięto tag: "+tag);
-                                if(Controller.daoContainer.getTagDao().delete(tag)){
-                                    System.out.println(" bezpowrotnie");
-                                    Controller.modelStructure.deleteTag(tag);
-
-                                }
+                                Controller.modelStructure.deleteTag(tag,true);
 
                             }
                             row.setTag(null);
@@ -187,10 +175,7 @@ public class TransactionTable extends TableView<TransactionItem> {
                                 long oldTagId = tag.getId();
                                 Tag oldTag = new Tag(oldTagId,"");
                                 Controller.daoContainer.getTransactionDao().setTag(transaction,null);
-                                if(Controller.daoContainer.getTagDao().delete(oldTag)){
-                                    System.out.println(" bezpowrotnie");
-                                    Controller.modelStructure.deleteTag(oldTag);
-                                }
+                                Controller.modelStructure.deleteTag(oldTag,true);
                             }
                             System.out.println(Controller.modelStructure.getTags());
                             Tag newTag = (Tag) selectTagBox.getSelectedItem();
