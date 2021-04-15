@@ -135,12 +135,12 @@ public class DBManager {
         stmt.execute("UPDATE sqlite_sequence SET seq=0 WHERE name='" + tableName + "';");
     }
     public static void addSampleData(String url) {
-        SourceDao sourceDao = new SourceDao(url);
-        CategoryDao categoryDao = new CategoryDao(url);
-        ExpenseDao expenseDao = new ExpenseDao(url);
-        NameDao nameDao = new NameDao(url);
-        UnitDao unitDao = new UnitDao(url);
-        TransactionDao transactionDao = new TransactionDao((url));
+        SourceDao sourceDao = new SourceDao();
+        CategoryDao categoryDao = new CategoryDao();
+        ExpenseDao expenseDao = new ExpenseDao();
+        NameDao nameDao = new NameDao();
+        UnitDao unitDao = new UnitDao();
+        TransactionDao transactionDao = new TransactionDao();
 
         try {
             Connection connection = DriverManager.getConnection("jdbc:sqlite:"+url);

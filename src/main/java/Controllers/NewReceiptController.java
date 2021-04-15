@@ -334,7 +334,7 @@ public class NewReceiptController extends Controller {
 
     @FXML
     void initialize() throws IOException {
-
+        System.out.println("initialize new receipt controller");
         setDatePickerTime();
         Controller.setAutoSize(splitPane, 100, 100);
         VBox.setVgrow(reciptTable, Priority.ALWAYS);

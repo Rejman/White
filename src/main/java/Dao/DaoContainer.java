@@ -1,7 +1,8 @@
 package Dao;
 
 public class DaoContainer {
-    private String dataBaseUrl = null;
+    private static String dataBaseUrl = null;
+
     private SourceDao sourceDao = null;
     private NameDao nameDao = null;
     private CategoryDao categoryDao = null;
@@ -10,45 +11,47 @@ public class DaoContainer {
     private TransactionDao transactionDao = null;
     private TagDao tagDao = null;
 
+
+
     public DaoContainer(String dataBaseUrl) {
         this.dataBaseUrl = dataBaseUrl;
     }
 
-    public String getDataBaseUrl() {
+    public static String getDataBaseUrl() {
         return dataBaseUrl;
     }
 
     public SourceDao getSourceDao() {
-        if (sourceDao == null) sourceDao = new SourceDao(this.dataBaseUrl);
+        if (sourceDao == null) sourceDao = new SourceDao();
         return sourceDao;
     }
     public TagDao getTagDao() {
-        if (tagDao == null) tagDao = new TagDao(this.dataBaseUrl);
+        if (tagDao == null) tagDao = new TagDao();
         return tagDao;
     }
 
     public NameDao getNameDao() {
-        if (nameDao == null) nameDao = new NameDao(this.dataBaseUrl);
+        if (nameDao == null) nameDao = new NameDao();
         return nameDao;
     }
 
     public CategoryDao getCategoryDao() {
-        if (categoryDao == null) categoryDao = new CategoryDao(this.dataBaseUrl);
+        if (categoryDao == null) categoryDao = new CategoryDao();
         return categoryDao;
     }
 
     public ExpenseDao getExpenseDao() {
-        if (expenseDao == null) expenseDao = new ExpenseDao(this.dataBaseUrl);
+        if (expenseDao == null) expenseDao = new ExpenseDao();
         return expenseDao;
     }
 
     public UnitDao getUnitDao() {
-        if (unitDao == null) unitDao = new UnitDao(this.dataBaseUrl);
+        if (unitDao == null) unitDao = new UnitDao();
         return unitDao;
     }
 
     public TransactionDao getTransactionDao() {
-        if (transactionDao == null) transactionDao = new TransactionDao(this.dataBaseUrl);
+        if (transactionDao == null) transactionDao = new TransactionDao();
         return transactionDao;
     }
 }

@@ -18,14 +18,11 @@ public class TransactionDao implements ModelDao<Transaction>{
     public static final String SELECT_SQL = " SELECT t.id, t.date, source_id, s.name as source_name, s.color as source_color, expense_id, name_id, n.name as expense_name, number, unit_price, unit_id, u.name as unit_name, u.shortcut, u.real_number, category_id, c.name as category_name, c.color as category_color, tags.id as tag_id, tags.name as tag_name FROM transactions t JOIN sources s ON s.id = source_id JOIN expenses e ON e.id = t.expense_id JOIN names n ON n.id = e.name_id JOIN units u ON u.id = e.unit_id JOIN categories c ON c.id=n.category_id LEFT JOIN tags ON tags.id=t.tag_id ORDER BY t.date DESC, s.name;";
     public static final String DELETE_SQL = "DELETE FROM transactions WHERE id=?;";
 
-    private String url;
-    public TransactionDao(String url) {
-        this.url = url;
-    }
+
     @Override
     public Transaction insertOne(Transaction model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             insert(model,conn);
             conn.close();
             return model;
@@ -41,7 +38,7 @@ public class TransactionDao implements ModelDao<Transaction>{
         Properties properties = new Properties();
         properties.setProperty("PRAGMA foreign_keys", "ON");
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url, properties);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl(), properties);
             PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
             ps.setLong(1,model.getId());
             ps.executeUpdate();
@@ -57,7 +54,7 @@ public class TransactionDao implements ModelDao<Transaction>{
     @Override
     public void update(Transaction model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(UPDATE_TAG_SQL);
             ps.setLong(1,model.getTag().getId());
             ps.setLong(2,model.getId());
@@ -69,7 +66,7 @@ public class TransactionDao implements ModelDao<Transaction>{
     }
     public void setTag(Transaction model, Tag tag){
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(SET_TAG_SQL);
             if(tag==null){
                 ps.setNull(1,0);
@@ -86,7 +83,7 @@ public class TransactionDao implements ModelDao<Transaction>{
     }
     public void deleteTag(Transaction model){
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(DELETE_TAG_SQL);
             ps.setLong(1,model.getId());
             ps.execute();
@@ -105,7 +102,7 @@ public class TransactionDao implements ModelDao<Transaction>{
     public ArrayList<Transaction> selectAllSorted() {
         ArrayList<Transaction> transactions = new ArrayList<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(SELECT_SQL);
             while(rs.next()) {

@@ -12,10 +12,6 @@ public class NameDao implements ModelDao<Name> {
     public static final String UPDATE_SQL = "UPDATE names SET name=?, category_id=? WHERE id=?";
     public static final String SELECT_SQL = "SELECT n.id AS name_id, n.name AS name_name, c.id AS category_id, c.name AS category_name, c.color AS category_color FROM names n INNER JOIN categories c ON c.id=n.category_id";
     public static final String DELETE_SQL = "DELETE FROM names WHERE id=?;";
-    private String url;
-    public NameDao(String url) {
-        this.url = url;
-    }
 
     @Override
     public Name insert(Name model, Connection conn) throws SQLException {
@@ -31,7 +27,7 @@ public class NameDao implements ModelDao<Name> {
     @Override
     public Name insertOne(Name model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             insert(model, conn);
             conn.close();
             return model;
@@ -46,7 +42,7 @@ public class NameDao implements ModelDao<Name> {
         Properties properties = new Properties();
         properties.setProperty("PRAGMA foreign_keys", "ON");
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url,properties);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl(),properties);
             Dao.enableForeignKeys(conn);
             PreparedStatement ps = conn.prepareStatement(DELETE_SQL);
             ps.setLong(1,model.getId());
@@ -63,7 +59,7 @@ public class NameDao implements ModelDao<Name> {
     @Override
     public void update(Name model) {
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             PreparedStatement ps = conn.prepareStatement(UPDATE_SQL);
             ps.setString(1,model.getName());
             ps.setInt(2, (int) model.getCategory().getId());
@@ -79,7 +75,7 @@ public class NameDao implements ModelDao<Name> {
     public HashSet<Name> selectAll() {
         HashSet<Name> names = new HashSet<>();
         try {
-            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + url);
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(SELECT_SQL);
             while(rs.next()) {
