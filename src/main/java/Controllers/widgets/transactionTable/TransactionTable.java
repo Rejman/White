@@ -8,6 +8,10 @@ import Controllers.widgets.inputPanels.SourcePanel;
 import Dao.DaoContainer;
 import Models.*;
 import Utils.ColorConvertor;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -31,7 +35,7 @@ public class TransactionTable extends TableView<TransactionItem> {
     private static StackPane tagPane = new StackPane();
     private static Scene tagScene = new Scene(tagPane);
     private Stage tagStage = new Stage();
-
+    private IntegerProperty selectedNumber = new SimpleIntegerProperty(0);
     private SelectBox<Tag> selectTagBox = new SelectBox<>();
 
     private ContextMenu contextMenu;
@@ -241,20 +245,59 @@ public class TransactionTable extends TableView<TransactionItem> {
     private ContextMenu buildContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getStyleClass().add("context");
-        MenuItem deleteSelected = new MenuItem("delete selected");
-        MenuItem selectAll = new MenuItem("select all");
-        MenuItem unselectAll = new MenuItem("unselect all");
-        MenuItem deleteTag = new MenuItem("delete tag");
-        MenuItem setTag = new MenuItem("set tag");
 
-        contextMenu.getItems().add(selectAll);
-        contextMenu.getItems().add(unselectAll);
-        contextMenu.getItems().add(deleteSelected);
-        contextMenu.getItems().add(deleteTag);
-        contextMenu.getItems().add(setTag);
+        Menu select = new Menu("select");
+        Menu tag = new Menu("tag");
+        tag.setDisable(true);
+        Menu edit = new Menu("edit");
+        edit.setDisable(true);
+
+        MenuItem delete = new MenuItem("delete");
+        delete.setDisable(true);
+        MenuItem selectAll = new MenuItem("all");
+        MenuItem selectNone = new MenuItem("none");
+        selectNone.setDisable(true);
+        select.getItems().add(selectAll);
+        select.getItems().add(selectNone);
+
+        MenuItem editSource = new MenuItem("source");
+        MenuItem editDate= new MenuItem("date");
+        MenuItem price= new MenuItem("unit/price");
+        edit.getItems().add(price);
+        edit.getItems().add(editDate);
+        edit.getItems().add(editSource);
+
+        MenuItem deleteTag = new MenuItem("delete");
+        MenuItem setTag = new MenuItem("add/set");
+        tag.getItems().add(setTag);
+        tag.getItems().add(deleteTag);
+
+        contextMenu.getItems().add(select);
+        contextMenu.getItems().add(delete);
+        contextMenu.getItems().add(new SeparatorMenuItem());
+        contextMenu.getItems().add(edit);
+        contextMenu.getItems().add(tag);
 
         setContextMenu(contextMenu);
-        deleteSelected.setOnAction(new EventHandler<ActionEvent>() {
+
+        selectedNumber.addListener((observable, oldValue, newValue) -> {
+
+            if(newValue.equals(0)){
+                select.setText("select");
+                tag.setDisable(true);
+                edit.setDisable(true);
+                delete.setDisable(true);
+                selectNone.setDisable(true);
+            }else{
+                select.setText("select ["+(int)newValue+"]");
+                tag.setDisable(false);
+                edit.setDisable(false);
+                delete.setDisable(false);
+                selectNone.setDisable(false);
+            }
+        });
+
+        delete.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 deleteSelected();
@@ -278,7 +321,7 @@ public class TransactionTable extends TableView<TransactionItem> {
                 selectAll();
             }
         });
-        unselectAll.setOnAction(new EventHandler<ActionEvent>() {
+        selectNone.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 unselectAll();
@@ -379,9 +422,11 @@ public class TransactionTable extends TableView<TransactionItem> {
 
                     if (item.isActive()) {
                         setColor(item.getLightColor(), row);
+                        selectedNumber.set(selectedNumber.get()-1);
                         item.setActive(false);
                     } else {
                         setColor(item.getColor(), row);
+                        selectedNumber.set(selectedNumber.get()+1);
                         item.setActive(true);
                     }
                 }
@@ -473,6 +518,7 @@ public class TransactionTable extends TableView<TransactionItem> {
     }
 
     void unselectAll() {
+        selectedNumber.set(0);
         for (TransactionItem item : getItems()
         ) {
             item.setActive(false);
@@ -481,9 +527,11 @@ public class TransactionTable extends TableView<TransactionItem> {
     }
 
     void selectAll() {
+        selectedNumber.set(0);
         for (TransactionItem item : getItems()
         ) {
             item.setActive(true);
+            selectedNumber.set(selectedNumber.get()+1);
         }
         refresh();
     }
