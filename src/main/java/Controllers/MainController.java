@@ -1,5 +1,6 @@
 package Controllers;
 
+import Controllers.widgets.ToolPane;
 import Dao.DaoContainer;
 import Models.Expense;
 import Models.Source;
@@ -14,8 +15,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.sqlite.SQLiteConfig;
@@ -239,6 +242,18 @@ public class MainController extends Controller {
             loadData.reset();
             loadData.start();
         }
+        Pane pane = new Pane();
+
+
+        ToolPane toolPane = new ToolPane();
+
+        toolPane.setMinWidth(100);
+        toolPane.setMinHeight(100);
+        //window.onMo
+        pane.getChildren().add(toolPane);
+        toolPane.setStyle("-fx-background-color: red");
+        pane.setStyle("-fx-background-color: rgba(255,255,255,.5)");
+        containerWithMenus.getChildren().add(pane);
     }
     public void updateOpenRecentMenu(){
         openRecentMenu.getItems().clear();

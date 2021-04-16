@@ -580,7 +580,8 @@ public class TransactionTable extends TableView<TransactionItem> {
     }
 
     void showTagWindow() {
-        innerStage = new Stage();
+
+        /*innerStage = new Stage();
         //!!!
 
         selectTagBox.addData(Controller.modelStructure.getTags());
@@ -588,7 +589,7 @@ public class TransactionTable extends TableView<TransactionItem> {
 
         innerStage.setScene(tagScene);
 
-        innerStage.show();
+        innerStage.show();*/
 
     }
     void showSourceWindow() {
