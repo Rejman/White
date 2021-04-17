@@ -26,7 +26,7 @@ public class Transaction extends Model {
         this.date = date;
         this.source = source;
         this.expense = expense;
-        this.number = new BigDecimal(number).setScale(2, RoundingMode.HALF_UP);
+        this.number = new BigDecimal(number).setScale(3, RoundingMode.HALF_UP);
         this.unit_price = new BigDecimal(unit_price).setScale(2, RoundingMode.HALF_UP);
         //if(tag==null) tag = "";
         this.tag = tag;

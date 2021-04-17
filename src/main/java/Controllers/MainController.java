@@ -242,19 +242,27 @@ public class MainController extends Controller {
             loadData.reset();
             loadData.start();
         }
-        Pane pane = new Pane();
 
 
-        ToolPane toolPane = new ToolPane();
+
+        /*ToolPane toolPane = new ToolPane();
 
         toolPane.setMinWidth(100);
         toolPane.setMinHeight(100);
         //window.onMo
         pane.getChildren().add(toolPane);
-        toolPane.setStyle("-fx-background-color: red");
-        pane.setStyle("-fx-background-color: rgba(255,255,255,.5)");
-        containerWithMenus.getChildren().add(pane);
+        toolPane.setStyle("-fx-background-color: red");*/
+        blockingArea.setStyle("-fx-background-color: rgba(255,255,255,.5)");
+
+        containerWithMenus.getChildren().add(blockingArea);
+        blockingArea.toBack();
     }
+    private static Pane blockingArea = new Pane();
+
+    public static Pane getBlockingArea() {
+        return blockingArea;
+    }
+
     public void updateOpenRecentMenu(){
         openRecentMenu.getItems().clear();
         for (String url:settings.recentDBs
