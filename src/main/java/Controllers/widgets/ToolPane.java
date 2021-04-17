@@ -1,6 +1,7 @@
 package Controllers.widgets;
 
 import Controllers.MainController;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.Cursor;
@@ -11,13 +12,14 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 
 public class ToolPane extends StackPane {
     Position resizeType;
@@ -25,44 +27,63 @@ public class ToolPane extends StackPane {
     private double y;
     private double maxWidth;
     private double maxHeight;
-    private StackPane mainStackPane = new StackPane();
+
     private StackPane content = new StackPane();
 
     public ToolPane() {
-        mainStackPane.setPadding(new Insets(1));
+
+        setPadding(new Insets(1));
 
         DropShadow dropShadow = new DropShadow();
         dropShadow.setColor(Color.GRAY);
-        dropShadow.setHeight(40);
-        dropShadow.setWidth(40);
+        dropShadow.setHeight(30);
+        dropShadow.setWidth(30);
         dropShadow.setOffsetX(3);
         dropShadow.setOffsetY(3);
         setEffect(dropShadow);
-        setStyle("-fx-background-color:grey");
+
+        setStyle("-fx-background-color: grey");
 
         VBox vBox = new VBox();
         ToolBar bar = new ToolBar();
+        //!!! to odwraca punkt początkowy przy liczeniu pikseli przy przsuwaniu myszką okienka
         bar.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+
         Image delete = new Image("icons/delete-24.png");
-        bar.getItems().add(new ImageView(delete));
+        AnchorPane closeButton = new AnchorPane();
+        ImageView imageView = new ImageView(delete);
+        imageView.setOpacity(0.5);
+        closeButton.setOnMouseEntered(event -> {
+            imageView.setOpacity(1);
+        });
+        closeButton.setOnMouseExited(event -> {
+            imageView.setOpacity(0.5);
+        });
+        closeButton.getChildren().add(imageView);
+        closeButton.setOnMouseClicked(event -> {
+            close();
+        });
+        bar.getItems().add(closeButton);
 
         vBox.getChildren().add(bar);
         vBox.getChildren().add(content);
-        mainStackPane.getChildren().add(vBox);
+        getChildren().add(vBox);
 
         bar.setOnMouseEntered(event -> {
             setCursor(Cursor.DEFAULT);
         });
         bar.setOnMousePressed(event -> {
             System.out.println("click");
-            x = event.getX();
+            x = bar.getWidth()-event.getX();
             y = event.getY();
-            maxWidth = getScene().getWidth() - mainStackPane.getWidth();
-            maxHeight = getScene().getHeight() - mainStackPane.getHeight();
+            System.out.println(x+" x "+y);
+            maxWidth = getScene().getWidth() - getWidth();
+            maxHeight = getScene().getHeight() - getHeight();
         });
         bar.setOnMouseDragged(event -> {
             /*double maxWidth = getScene().getWidth();
             double maxHeight = getScene().getHeight();*/
+
 
             double sceneX = event.getSceneX();
             double sceneY = event.getSceneY();
@@ -79,14 +100,14 @@ public class ToolPane extends StackPane {
             setLayoutY(newY);
         });
         //setOnMouseEntered(event -> setCursor(event));
-        mainStackPane.setOnMouseMoved(event -> setCursor(event));
+        setOnMouseMoved(event -> setCursor(event));
         bar.setOnMouseEntered(event -> {
             setCursor(Cursor.DEFAULT);
         });
         content.setOnMouseEntered(event -> {
             setCursor(Cursor.DEFAULT);
         });
-        getChildren().add(mainStackPane);
+
     }
     private void resize(javafx.scene.input.MouseEvent event) {
 
@@ -99,8 +120,8 @@ public class ToolPane extends StackPane {
     private void setCursor(javafx.scene.input.MouseEvent event) {
         int hMargin = 3;
         int vMargin = 3;
-        double width = mainStackPane.getWidth();
-        double height = mainStackPane.getHeight();
+        double width = getWidth();
+        double height = getHeight();
         x = event.getX();
         y = event.getY();
         boolean west = false;
