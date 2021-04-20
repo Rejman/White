@@ -1,6 +1,8 @@
 package Controllers.widgets;
 
 import Controllers.MainController;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.NodeOrientation;
@@ -13,10 +15,7 @@ import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
@@ -25,11 +24,24 @@ public class ToolPane extends StackPane {
     Position resizeType;
     private double x;
     private double y;
-    private double maxWidth;
-    private double maxHeight;
+    private double maxX;
+    private double maxY;
+
 
     private StackPane content = new StackPane();
+    public void onAutoLocation(double startX, double startY){
 
+
+        getScene().widthProperty().addListener((observable, oldValue, newValue) -> {
+            setLayoutX((newValue.doubleValue()-getWidth())/2);
+        });
+
+        getScene().heightProperty().addListener((observable, oldValue, newValue) -> {
+            setLayoutY((newValue.doubleValue()-getHeight())/2);
+        });
+        setLayoutY(startY);
+        setLayoutX(startX);
+    }
     public ToolPane() {
 
         setPadding(new Insets(1));
@@ -71,14 +83,15 @@ public class ToolPane extends StackPane {
 
         bar.setOnMouseEntered(event -> {
             setCursor(Cursor.DEFAULT);
+
         });
         bar.setOnMousePressed(event -> {
             System.out.println("click");
             x = bar.getWidth()-event.getX();
             y = event.getY();
             System.out.println(x+" x "+y);
-            maxWidth = getScene().getWidth() - getWidth();
-            maxHeight = getScene().getHeight() - getHeight();
+            maxX = getScene().getWidth() - getWidth();
+            maxY = getScene().getHeight() - bar.getHeight();
         });
         bar.setOnMouseDragged(event -> {
             /*double maxWidth = getScene().getWidth();
@@ -90,17 +103,13 @@ public class ToolPane extends StackPane {
             double newX = sceneX - x;
             double newY = sceneY - y;
 
-            if (newX < 0) newX = 0;
-            if (newY < 0) newY = 0;
+            setLocation(newX,newY);
 
-            if (newX >= maxWidth) newX = maxWidth;
-            if (newY >= maxHeight) newY = maxHeight;
-
-            setLayoutX(newX);
-            setLayoutY(newY);
         });
         //setOnMouseEntered(event -> setCursor(event));
-        setOnMouseMoved(event -> setCursor(event));
+        setOnMouseMoved(event ->
+            setCursor(event));
+        setOnMouseDragged(event -> resize(event));
         bar.setOnMouseEntered(event -> {
             setCursor(Cursor.DEFAULT);
         });
@@ -109,13 +118,62 @@ public class ToolPane extends StackPane {
         });
 
     }
+    private void setPositionX(double x){
+        if (y < 0) y = 0;
+        if (y >= maxY) y = maxY;
+        setLayoutX(x);
+    }
+    private void setPositionY(double y){
+        if (x < 0) x = 0;
+        if (x >= maxX) x = maxX;
+        setLayoutY(y);
+    }
+    private void setLocation(double x, double y){
+        /*setPositionX(x);
+        setPositionY(y);*/
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+
+        if (x >= maxX) x = maxX;
+        if (y >= maxY) y = maxY;
+
+        setLayoutX(x);
+        setLayoutY(y);
+    }
+    private double minWidth;
+    private double minHeight;
     private void resize(javafx.scene.input.MouseEvent event) {
+        System.out.println(resizeType+" - "+event.getX()+" x "+event.getY());
+        double height = event.getY();
+        double width = event.getX();
+        switch (resizeType){
+            case S:
 
-       /* switch (resizeType){
-            case W:
-                setWidth(x);
+                if(height>minHeight){
+                    setMinHeight(height);
+                    setMaxHeight(height);
+                }
 
-        }*/
+                break;
+            case E:
+
+                if(width>minWidth){
+                    setMinWidth(width);
+                    setMaxWidth(width);
+                }
+                break;
+            case SE:
+                if(height>minHeight){
+                    setMinHeight(height);
+                    setMaxHeight(height);
+                }
+                if(width>minWidth){
+                    setMinWidth(width);
+                    setMaxWidth(width);
+                }
+                break;
+
+        }
     }
     private void setCursor(javafx.scene.input.MouseEvent event) {
         int hMargin = 3;
@@ -179,16 +237,16 @@ public class ToolPane extends StackPane {
         MainController.getBlockingArea().toBack();
     }
 
-    public void setContent(Node node) {
+    public void setContent(Region node) {
         content.getChildren().clear();
+        minHeight = node.getMinHeight();
+        minWidth = node.getMinWidth();
         content.getChildren().add(node);
+
     }
 
     public void resetPosition() {
-
-        System.out.println("reset: " + this.getWidth() + "x" + this.getHeight());
-        setLayoutX((getScene().getWidth() / 2 - getWidth() / 2));
-        setLayoutY((getScene().getHeight() / 2 - getHeight() / 2));
+        setLocation(getScene().getWidth()/2,getScene().getHeight()/2);
     }
 
     enum Position {

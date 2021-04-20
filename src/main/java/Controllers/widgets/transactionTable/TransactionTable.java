@@ -335,7 +335,10 @@ public class TransactionTable extends TableView<TransactionItem> {
         setTag.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                showTagWindow();
+
+                double x = setTag.getParentPopup().getX();
+                double y = setTag.getParentPopup().getY();
+                showTagWindow(x, y);
             }
         });
         editSource.setOnAction(new EventHandler<ActionEvent>() {
@@ -619,15 +622,19 @@ public class TransactionTable extends TableView<TransactionItem> {
         deleteTag.start();
     }
 
-    void showTagWindow() {
+    void showTagWindow(double x, double y) {
 
         selectTagBox.addData(Controller.modelStructure.getTags());
+/*        selectTagBox.setMinWidth(200);
+        selectTagBox.setMinHeight(200);*/
         editWindow.setContent(selectTagBox);
         Pane blockingArea =  MainController.getBlockingArea();
         blockingArea.getChildren().add(editWindow);
-
+        System.out.println("UWAGAUWAGA: "+x+"x"+y);
+        editWindow.onAutoLocation(x,y);
         blockingArea.toFront();
-        editWindow.resetPosition();
+        //yyy
+        //editWindow.resetPosition();
 
     }
     void showSourceWindow() {
