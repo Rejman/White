@@ -14,6 +14,7 @@ public class TransactionDao implements ModelDao<Transaction>{
     public static final String INSERT_SQL = "INSERT INTO transactions (date, source_id, expense_id, number, unit_price, tag_id) VALUES(?,?,?,?,?,?)";
     public static final String UPDATE_TAG_SQL = "UPDATE transactions SET tag_id=? WHERE id=?";
     public static final String SET_TAG_SQL = "UPDATE transactions SET tag_id=? WHERE id=?";
+    public static final String SET_SOURCE_SQL = "UPDATE transactions SET source_id=? WHERE id=?";
     public static final String DELETE_TAG_SQL = "UPDATE transactions SET tag_id=NULL WHERE id=?";
     public static final String SELECT_SQL = " SELECT t.id, t.date, source_id, s.name as source_name, s.color as source_color, expense_id, name_id, n.name as expense_name, number, unit_price, unit_id, u.name as unit_name, u.shortcut, u.real_number, category_id, c.name as category_name, c.color as category_color, tags.id as tag_id, tags.name as tag_name FROM transactions t JOIN sources s ON s.id = source_id JOIN expenses e ON e.id = t.expense_id JOIN names n ON n.id = e.name_id JOIN units u ON u.id = e.unit_id JOIN categories c ON c.id=n.category_id LEFT JOIN tags ON tags.id=t.tag_id ORDER BY t.date DESC, s.name;";
     public static final String DELETE_SQL = "DELETE FROM transactions WHERE id=?;";
@@ -58,6 +59,23 @@ public class TransactionDao implements ModelDao<Transaction>{
             PreparedStatement ps = conn.prepareStatement(UPDATE_TAG_SQL);
             ps.setLong(1,model.getTag().getId());
             ps.setLong(2,model.getId());
+            ps.execute();
+            conn.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+    public void setSource(Transaction model, Source source){
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DaoContainer.getDataBaseUrl());
+            PreparedStatement ps = conn.prepareStatement(SET_SOURCE_SQL);
+            if(source==null){
+                ps.setNull(1,0);
+            }else{
+                ps.setLong(1,source.getId());
+            }
+            ps.setLong(2,model.getId());
+
             ps.execute();
             conn.close();
         } catch (SQLException throwables) {

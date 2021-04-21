@@ -134,6 +134,10 @@ public class ModelStructure {
         categories.add(category);
         categoryNames.add(category.getName());
     }
+    public void addNewSource(Source source) {
+        sources.add(source);
+        sourceNames.add(source.getName());
+    }
 
     public boolean deleteTag(Tag tag, boolean permanently) {
         boolean delete = true;

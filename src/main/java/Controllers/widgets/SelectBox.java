@@ -43,6 +43,7 @@ public class SelectBox<T extends Model> extends SearchBox<T> {
     }
 
     public void setSelectedItem(Model selectedItem) {
+        selected.setValue(true);
         this.selectedItem = selectedItem;
     }
 

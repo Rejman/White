@@ -1,3 +1,4 @@
+import Controllers.Controller;
 import Controllers.MainController;
 import Controllers.widgets.transactionTable.TransactionTable;
 import javafx.application.Application;
@@ -5,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
+import javax.naming.ldap.Control;
 
 public class Main extends Application {
 
@@ -37,6 +40,7 @@ public class Main extends Application {
         Scene scene = new Scene(stackPane);
         loadStyle(scene, STYLE_PATHS);
         primaryStage.setScene(scene);
+
         TransactionTable.getTagScene().getStylesheets().add(Main.class.getResource("style/search-box.css").toExternalForm());
         TransactionTable.getSourceScene().getStylesheets().add(Main.class.getResource("style/input-panel.css").toExternalForm());
 

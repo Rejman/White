@@ -1,6 +1,7 @@
 package Controllers.widgets.inputPanels;
 
 import Controllers.widgets.SelectBox;
+import Controllers.widgets.ToolPane;
 import Models.Model;
 import Utils.ModelStructure;
 import javafx.beans.property.BooleanProperty;
@@ -26,6 +27,10 @@ public class Panel<T extends Model> extends StackPane implements Called{
     protected Called nextPanel = null;
     protected Label header = new Label();
     protected ImageView imageView = new ImageView();
+
+    public SelectBox<T> getSelectBox() {
+        return selectBox;
+    }
 
     public T getSelected(){
         return (T) selectBox.getSelectedItem();
@@ -87,5 +92,6 @@ public class Panel<T extends Model> extends StackPane implements Called{
         if(nextPanel!=null){
             nextPanel.enable();
         }
+
     }
 }

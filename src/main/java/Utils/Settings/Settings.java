@@ -11,7 +11,7 @@ public class Settings implements Serializable {
     public int logoWidth = 100;
     public int logoHeight = 100;
     public int logoTextSize = 36;
-    public LimitedSet recentDBs = new LimitedSet(3);
+    public LimitedSet recentDBs = new LimitedSet(10);
     
     public Settings() {
     }

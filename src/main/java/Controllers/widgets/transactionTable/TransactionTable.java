@@ -1,18 +1,15 @@
 package Controllers.widgets.transactionTable;
 
 import Controllers.Controller;
-import Controllers.MainController;
 import Controllers.widgets.HistoryPosition;
 import Controllers.widgets.SelectBox;
 import Controllers.widgets.ToolPane;
+import Controllers.widgets.inputPanels.SeparateSourcePanel;
 import Controllers.widgets.inputPanels.SourcePanel;
-import Dao.DaoContainer;
 import Models.*;
 import Utils.ColorConvertor;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -25,24 +22,21 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Modality;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TransactionTable extends TableView<TransactionItem> {
     private static StackPane tagPane = new StackPane();
     private static StackPane sourcePane = new StackPane();
     private static Scene tagScene = new Scene(tagPane);
     private static Scene sourceScene = new Scene(sourcePane);
-    private Stage innerStage = new Stage();
     protected IntegerProperty selectedNumber = new SimpleIntegerProperty(0);
+    private Stage innerStage = new Stage();
     private SelectBox<Tag> selectTagBox = new SelectBox<>();
 
     private ContextMenu contextMenu;
@@ -77,26 +71,26 @@ public class TransactionTable extends TableView<TransactionItem> {
                             Tag tag = transaction.getTag();
 
                             if (Controller.daoContainer.getTransactionDao().delete(row.getTransaction())) {
-                                if(tag!=null){
-                                    if(Controller.modelStructure.deleteTag(tag,true)){
-                                        System.out.println("usuwam tag: "+tag);
+                                if (tag != null) {
+                                    if (Controller.modelStructure.deleteTag(tag, true)) {
+                                        System.out.println("usuwam tag: " + tag);
                                     }
                                 }
 
 
-                                if(Controller.modelStructure.deleteSource(source, true)){
-                                    System.out.println("usuwam source: "+source);
+                                if (Controller.modelStructure.deleteSource(source, true)) {
+                                    System.out.println("usuwam source: " + source);
                                 }
 
                                 if (Controller.modelStructure.deleteExpense(expense, true)) {
-                                    System.out.println("usuwam expense: "+expense);
-                                    if(Controller.modelStructure.deleteUnit(unit, true)){
-                                        System.out.println("usuwam unit: "+unit);
+                                    System.out.println("usuwam expense: " + expense);
+                                    if (Controller.modelStructure.deleteUnit(unit, true)) {
+                                        System.out.println("usuwam unit: " + unit);
                                     }
                                     if (Controller.modelStructure.deleteName(name, true)) {
-                                        System.out.println("usuwam name: "+name);
-                                        if(Controller.modelStructure.deleteCategory(category, true)){
-                                            System.out.println("usuwam category: "+category);
+                                        System.out.println("usuwam name: " + name);
+                                        if (Controller.modelStructure.deleteCategory(category, true)) {
+                                            System.out.println("usuwam category: " + category);
                                         }
                                     }
                                 }
@@ -143,12 +137,12 @@ public class TransactionTable extends TableView<TransactionItem> {
                         if (row.isActive()) {
                             Transaction transaction = row.getTransaction();
                             Tag tag = transaction.getTag();
-                            if(tag!=null){
+                            if (tag != null) {
 
-                                System.out.println(tag+" - "+tag.getId());
-                                Controller.daoContainer.getTransactionDao().setTag(transaction,null);
-                                System.out.println("usnięto tag: "+tag);
-                                Controller.modelStructure.deleteTag(tag,true);
+                                System.out.println(tag + " - " + tag.getId());
+                                Controller.daoContainer.getTransactionDao().setTag(transaction, null);
+                                System.out.println("usnięto tag: " + tag);
+                                Controller.modelStructure.deleteTag(tag, true);
 
                             }
                             row.setTag(null);
@@ -175,6 +169,61 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
+    private Service updateSource = new Service() {
+        @Override
+        protected Task createTask() {
+            return new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    Source oldSource = null;
+
+                    Source selectedSource = sourcePanel.getSelected();
+                    System.out.println("Ustawiam: "+selectedSource);
+                    if(selectedSource!=null){
+                        if(selectedSource.getId()<0){
+                            System.out.println("nowy sklep");
+                            selectedSource = Controller.daoContainer.getSourceDao().insertOne(sourcePanel.getSelected());
+                            Controller.modelStructure.addNewSource(selectedSource);
+                        }
+
+                        ObservableList<TransactionItem> items = getItems();
+                        ArrayList<TransactionItem> rows = new ArrayList<>(items);
+
+                        oldSource = rows.get(0).getTransaction().getSource();
+
+                        Source finalSelectedSource = selectedSource;
+                        rows.forEach(row -> {
+                            if (row.isActive()) {
+                                System.out.println("dla: "+row);
+                                Transaction transaction = row.getTransaction();
+                                transaction.setSource(finalSelectedSource);
+                                Controller.daoContainer.getTransactionDao().setSource(transaction, finalSelectedSource);
+                            }
+                        });
+                        Controller.modelStructure.deleteSource(oldSource,true);
+                    }
+
+
+                    return null;
+                }
+
+                @Override
+                protected void failed() {
+                    getException().printStackTrace();
+
+                }
+
+                @Override
+                protected void succeeded() {
+                    //add to view
+
+                    /*.unselect();
+                    selectTagBox.refresh();*/
+                    //unselectAll();
+                }
+            };
+        }
+    };
     private Service updateTag = new Service() {
         @Override
         protected Task createTask() {
@@ -195,18 +244,18 @@ public class TransactionTable extends TableView<TransactionItem> {
                             Transaction transaction = row.getTransaction();
                             Tag tag = transaction.getTag();
 
-                            if(tag!=null){
+                            if (tag != null) {
                                 long oldTagId = tag.getId();
-                                Tag oldTag = new Tag(oldTagId,"");
-                                Controller.daoContainer.getTransactionDao().setTag(transaction,null);
-                                Controller.modelStructure.deleteTag(oldTag,true);
+                                Tag oldTag = new Tag(oldTagId, "");
+                                Controller.daoContainer.getTransactionDao().setTag(transaction, null);
+                                Controller.modelStructure.deleteTag(oldTag, true);
                             }
                             System.out.println(Controller.modelStructure.getTags());
                             Tag newTag = (Tag) selectTagBox.getSelectedItem();
                             System.out.println(newTag);
                             row.setTag(newTag);
                             transaction.setTag(newTag);
-                            Controller.daoContainer.getTransactionDao().setTag(transaction,newTag);
+                            Controller.daoContainer.getTransactionDao().setTag(transaction, newTag);
                         }
                     });
                     return null;
@@ -229,8 +278,22 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
+
+    //separate
     private SourcePanel sourcePanel = null;
+    private ToolPane editWindow = new ToolPane();
+    private double cursorX;
+    private double cursorY;
     public TransactionTable() {
+        setOnMouseClicked(event -> {
+            Scene scene = getScene();
+            if(scene!=null){
+                cursorX = event.getSceneX();
+                cursorY = event.getSceneY();
+            }
+
+        });
+
         getStyleClass().add("transactionTable");
         setFocusTraversable(false);
         setEditable(true);
@@ -241,9 +304,15 @@ public class TransactionTable extends TableView<TransactionItem> {
         constructRows();
         sourcePanel = null;
         try {
-            System.out.println("udało się");
-            sourcePanel = new SourcePanel(Controller.modelStructure,null);
-            //sourcePanel.setNextPanel(sourcePanel);
+            sourcePanel = new SeparateSourcePanel(Controller.modelStructure, editWindow);
+            sourcePanel.getSelectBox().selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if(newValue){
+                    System.out.println("URUCHAMIAM SERWIS");
+                    updateSource.reset();
+                    updateSource.start();
+                }
+            });
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -252,7 +321,6 @@ public class TransactionTable extends TableView<TransactionItem> {
         selectTagBox = buildSelectTagBox();
         tagPane.getChildren().add(selectTagBox);
         sourcePane.getChildren().add(sourcePanel);
-
 
 
     }
@@ -284,8 +352,8 @@ public class TransactionTable extends TableView<TransactionItem> {
         select.getItems().add(selectNone);
 
         MenuItem editSource = new MenuItem("source");
-        MenuItem editDate= new MenuItem("date");
-        MenuItem price= new MenuItem("unit/price");
+        MenuItem editDate = new MenuItem("date");
+        MenuItem price = new MenuItem("unit/price");
         edit.getItems().add(price);
         edit.getItems().add(editDate);
         edit.getItems().add(editSource);
@@ -298,21 +366,21 @@ public class TransactionTable extends TableView<TransactionItem> {
         contextMenu.getItems().add(select);
         contextMenu.getItems().add(delete);
         contextMenu.getItems().add(new SeparatorMenuItem());
-        if(getClass().equals(TransactionTable.class)) contextMenu.getItems().add(edit);
+        if (getClass().equals(TransactionTable.class)) contextMenu.getItems().add(edit);
         contextMenu.getItems().add(tag);
 
         setContextMenu(contextMenu);
 
         selectedNumber.addListener((observable, oldValue, newValue) -> {
 
-            if(newValue.equals(0)){
+            if (newValue.equals(0)) {
                 select.setText("select");
                 tag.setDisable(true);
                 edit.setDisable(true);
                 delete.setDisable(true);
                 selectNone.setDisable(true);
-            }else{
-                select.setText("select ["+(int)newValue+"]");
+            } else {
+                select.setText("select [" + (int) newValue + "]");
                 tag.setDisable(false);
                 edit.setDisable(false);
                 delete.setDisable(false);
@@ -338,7 +406,7 @@ public class TransactionTable extends TableView<TransactionItem> {
 
                 double x = setTag.getParentPopup().getX();
                 double y = setTag.getParentPopup().getY();
-                showTagWindow(x, y);
+                showTagWindow();
             }
         });
         editSource.setOnAction(new EventHandler<ActionEvent>() {
@@ -454,11 +522,11 @@ public class TransactionTable extends TableView<TransactionItem> {
 
                     if (item.isActive()) {
                         setColor(item.getLightColor(), row);
-                        selectedNumber.set(selectedNumber.get()-1);
+                        selectedNumber.set(selectedNumber.get() - 1);
                         item.setActive(false);
                     } else {
                         setColor(item.getColor(), row);
-                        selectedNumber.set(selectedNumber.get()+1);
+                        selectedNumber.set(selectedNumber.get() + 1);
                         item.setActive(true);
                     }
                 }
@@ -466,56 +534,7 @@ public class TransactionTable extends TableView<TransactionItem> {
             return row;
         });
     }
-    private ToolPane editWindow = new ToolPane();
-    /*public SelectBox<Source> buildSelectSourceBox() {
 
-        //selectTagBox.addData(Controller.modelStructure.getTags());
-        sourcePanel.getB.selectedProperty().addListener(((observable, oldValue, newValue) -> {
-            boolean transactions = getClass().equals(TransactionTable.class);
-            if (newValue) {
-
-                if (selectTagBox.getSelectedItem() == null) {
-
-                    if(transactions){
-                        Tag unknown = Controller.daoContainer.getTagDao().insertOne(new Tag(selectTagBox.getText()));
-                        selectTagBox.setSelectedItem(unknown);
-                        Controller.modelStructure.addNewTag(unknown);
-                    }else{
-                        Tag unknown = new Tag(selectTagBox.getText());
-                        selectTagBox.setSelectedItem(unknown);
-                        Controller.modelStructure.addNewTag(unknown);
-                    }
-
-
-                }
-                if(transactions){
-
-                    updateTag.reset();
-                    updateTag.start();
-                }else{
-                    ObservableList<TransactionItem> items = getItems();
-                    ArrayList<TransactionItem> rows = new ArrayList<>(items);
-
-
-                    rows.forEach(row -> {
-                        if (row.isActive()) {
-
-                            row.setTag((Tag)selectTagBox.getSelectedItem());
-                        }
-                    });
-
-                    selectTagBox.unselect();
-                    selectTagBox.refresh();
-
-                    unselectAll();
-                }
-                editWindow.close();
-                //innerStage.close();
-                this.refresh();
-            }
-        }));
-        return selectTagBox;
-    }*/
     public SelectBox<Tag> buildSelectTagBox() {
 
         //selectTagBox.addData(Controller.modelStructure.getTags());
@@ -525,11 +544,11 @@ public class TransactionTable extends TableView<TransactionItem> {
 
                 if (selectTagBox.getSelectedItem() == null) {
 
-                    if(transactions){
+                    if (transactions) {
                         Tag unknown = Controller.daoContainer.getTagDao().insertOne(new Tag(selectTagBox.getText()));
                         selectTagBox.setSelectedItem(unknown);
                         Controller.modelStructure.addNewTag(unknown);
-                    }else{
+                    } else {
                         Tag unknown = new Tag(selectTagBox.getText());
                         selectTagBox.setSelectedItem(unknown);
                         Controller.modelStructure.addNewTag(unknown);
@@ -537,11 +556,11 @@ public class TransactionTable extends TableView<TransactionItem> {
 
 
                 }
-                if(transactions){
+                if (transactions) {
 
                     updateTag.reset();
                     updateTag.start();
-                }else{
+                } else {
                     ObservableList<TransactionItem> items = getItems();
                     ArrayList<TransactionItem> rows = new ArrayList<>(items);
 
@@ -549,7 +568,7 @@ public class TransactionTable extends TableView<TransactionItem> {
                     rows.forEach(row -> {
                         if (row.isActive()) {
 
-                            row.setTag((Tag)selectTagBox.getSelectedItem());
+                            row.setTag((Tag) selectTagBox.getSelectedItem());
                         }
                     });
 
@@ -559,7 +578,6 @@ public class TransactionTable extends TableView<TransactionItem> {
                     unselectAll();
                 }
                 editWindow.close();
-                //innerStage.close();
                 this.refresh();
             }
         }));
@@ -605,7 +623,7 @@ public class TransactionTable extends TableView<TransactionItem> {
         for (TransactionItem item : getItems()
         ) {
             item.setActive(true);
-            selectedNumber.set(selectedNumber.get()+1);
+            selectedNumber.set(selectedNumber.get() + 1);
         }
         refresh();
     }
@@ -622,39 +640,18 @@ public class TransactionTable extends TableView<TransactionItem> {
         deleteTag.start();
     }
 
-    void showTagWindow(double x, double y) {
-
+    void showTagWindow() {
         selectTagBox.addData(Controller.modelStructure.getTags());
-/*        selectTagBox.setMinWidth(200);
-        selectTagBox.setMinHeight(200);*/
         editWindow.setContent(selectTagBox);
-        Pane blockingArea =  MainController.getBlockingArea();
-        blockingArea.getChildren().add(editWindow);
-        System.out.println("UWAGAUWAGA: "+x+"x"+y);
-        editWindow.onAutoLocation(x,y);
-        blockingArea.toFront();
-        //yyy
-        //editWindow.resetPosition();
-
+        editWindow.show(cursorX,cursorY);
     }
+
     void showSourceWindow() {
-        //selectTagBox.addData(Controller.modelStructure.getTags());
-        editWindow.setContent(sourcePane);
-        Pane blockingArea =  MainController.getBlockingArea();
-        blockingArea.getChildren().add(editWindow);
 
-        blockingArea.toFront();
-        editWindow.resetPosition();
+        sourcePanel.reset();
         sourcePanel.enable();
-        /*innerStage = new Stage();
-        //!!!
-
-        //selectTagBox.addData(Controller.modelStructure.getTags());
-        innerStage.setTitle("Set tag for selected transaction");
-        sourcePanel.enable();
-        innerStage.setScene(sourceScene);
-
-        innerStage.show();*/
+        editWindow.setContent(sourcePanel);
+        editWindow.show(cursorX,cursorY);
 
     }
 
