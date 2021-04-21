@@ -1,6 +1,7 @@
 package Controllers.widgets.transactionTable;
 
 import Controllers.Controller;
+import Controllers.HistoryController;
 import Controllers.widgets.HistoryPosition;
 import Controllers.widgets.SelectBox;
 import Controllers.widgets.ToolPane;
@@ -8,6 +9,7 @@ import Controllers.widgets.inputPanels.SeparateSourcePanel;
 import Controllers.widgets.inputPanels.SourcePanel;
 import Models.*;
 import Utils.ColorConvertor;
+import Utils.DateConvertor;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
@@ -22,25 +24,24 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Date;
 
 public class TransactionTable extends TableView<TransactionItem> {
-    private static StackPane tagPane = new StackPane();
-    private static StackPane sourcePane = new StackPane();
-    private static Scene tagScene = new Scene(tagPane);
-    private static Scene sourceScene = new Scene(sourcePane);
+
     protected IntegerProperty selectedNumber = new SimpleIntegerProperty(0);
-    private Stage innerStage = new Stage();
-    private SelectBox<Tag> selectTagBox = new SelectBox<>();
-
+    DatePicker datePicker;
+    private SelectBox<Tag> selectTagBox;
+    private SourcePanel sourcePanel;
+    private ToolPane editWindow = new ToolPane();
+    private double cursorX;
+    private double cursorY;
     private ContextMenu contextMenu;
-
     private TableColumn<String, TransactionItem> nameTableColumn = new TableColumn<>("name");
     private TableColumn<String, TransactionItem> quantityTableColumn = new TableColumn<>("number");
     private TableColumn<String, TransactionItem> unitTableColumn = new TableColumn<>("unit");
@@ -48,8 +49,6 @@ public class TransactionTable extends TableView<TransactionItem> {
     private TableColumn<String, TransactionItem> totalPriceTableColumn = new TableColumn<>("TOTAL");
     private TableColumn<String, TransactionItem> tagTableColumn = new TableColumn<>("tag");
     private TableColumn<TransactionItem, Boolean> checkTableColumn = new TableColumn<>("");
-
-
     private Service deleteSelected = new Service() {
         @Override
         protected Task createTask() {
@@ -77,11 +76,9 @@ public class TransactionTable extends TableView<TransactionItem> {
                                     }
                                 }
 
-
                                 if (Controller.modelStructure.deleteSource(source, true)) {
                                     System.out.println("usuwam source: " + source);
                                 }
-
                                 if (Controller.modelStructure.deleteExpense(expense, true)) {
                                     System.out.println("usuwam expense: " + expense);
                                     if (Controller.modelStructure.deleteUnit(unit, true)) {
@@ -106,12 +103,10 @@ public class TransactionTable extends TableView<TransactionItem> {
                 @Override
                 protected void failed() {
                     getException().printStackTrace();
-
                 }
 
                 @Override
                 protected void succeeded() {
-                    //add to view
 
                     refresh();
                     System.out.println("Update total");
@@ -122,7 +117,6 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
-
     private Service deleteTag = new Service() {
         @Override
         protected Task createTask() {
@@ -169,61 +163,6 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
-    private Service updateSource = new Service() {
-        @Override
-        protected Task createTask() {
-            return new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    Source oldSource = null;
-
-                    Source selectedSource = sourcePanel.getSelected();
-                    System.out.println("Ustawiam: "+selectedSource);
-                    if(selectedSource!=null){
-                        if(selectedSource.getId()<0){
-                            System.out.println("nowy sklep");
-                            selectedSource = Controller.daoContainer.getSourceDao().insertOne(sourcePanel.getSelected());
-                            Controller.modelStructure.addNewSource(selectedSource);
-                        }
-
-                        ObservableList<TransactionItem> items = getItems();
-                        ArrayList<TransactionItem> rows = new ArrayList<>(items);
-
-                        oldSource = rows.get(0).getTransaction().getSource();
-
-                        Source finalSelectedSource = selectedSource;
-                        rows.forEach(row -> {
-                            if (row.isActive()) {
-                                System.out.println("dla: "+row);
-                                Transaction transaction = row.getTransaction();
-                                transaction.setSource(finalSelectedSource);
-                                Controller.daoContainer.getTransactionDao().setSource(transaction, finalSelectedSource);
-                            }
-                        });
-                        Controller.modelStructure.deleteSource(oldSource,true);
-                    }
-
-
-                    return null;
-                }
-
-                @Override
-                protected void failed() {
-                    getException().printStackTrace();
-
-                }
-
-                @Override
-                protected void succeeded() {
-                    //add to view
-
-                    /*.unselect();
-                    selectTagBox.refresh();*/
-                    //unselectAll();
-                }
-            };
-        }
-    };
     private Service updateTag = new Service() {
         @Override
         protected Task createTask() {
@@ -233,11 +172,7 @@ public class TransactionTable extends TableView<TransactionItem> {
 
                     ObservableList<TransactionItem> items = getItems();
                     ArrayList<TransactionItem> rows = new ArrayList<>(items);
-                    /*if (selectTagBox.getSelectedItem() == null) {
-                        Tag unknown = Controller.daoContainer.getTagDao().insertOne(new Tag(selectTagBox.getText()));
-                        selectTagBox.setSelectedItem(unknown);
-                        Controller.modelStructure.addNewTag(unknown);
-                    }*/
+
                     rows.forEach(row -> {
                         if (row.isActive()) {
 
@@ -278,16 +213,102 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
+    private Service updateSource = new Service() {
+        @Override
+        protected Task createTask() {
+            return new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    Source oldSource = null;
 
-    //separate
-    private SourcePanel sourcePanel = null;
-    private ToolPane editWindow = new ToolPane();
-    private double cursorX;
-    private double cursorY;
-    public TransactionTable() {
+                    Source selectedSource = sourcePanel.getSelected();
+                    System.out.println("Ustawiam: " + selectedSource);
+                    if (selectedSource != null) {
+                        if (selectedSource.getId() < 0) {
+                            System.out.println("nowy sklep");
+                            selectedSource = Controller.daoContainer.getSourceDao().insertOne(sourcePanel.getSelected());
+                            Controller.modelStructure.addNewSource(selectedSource);
+                        }
+
+                        ObservableList<TransactionItem> items = getItems();
+                        ArrayList<TransactionItem> rows = new ArrayList<>(items);
+
+                        oldSource = rows.get(0).getTransaction().getSource();
+
+                        Source finalSelectedSource = selectedSource;
+                        rows.forEach(row -> {
+                            if (row.isActive()) {
+                                System.out.println("dla: " + row);
+                                Transaction transaction = row.getTransaction();
+                                transaction.setSource(finalSelectedSource);
+                                Controller.daoContainer.getTransactionDao().setSource(transaction, finalSelectedSource);
+                            }
+                        });
+                        Controller.modelStructure.deleteSource(oldSource, true);
+                    }
+
+
+                    return null;
+                }
+
+                @Override
+                protected void failed() {
+                    getException().printStackTrace();
+
+                }
+
+                @Override
+                protected void succeeded() {
+
+                }
+            };
+        }
+    };
+    private Service updateDate = new Service() {
+        @Override
+        protected Task createTask() {
+            return new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    ObservableList<TransactionItem> items = getItems();
+                    ArrayList<TransactionItem> rows = new ArrayList<>(items);
+                    rows.forEach(row -> {
+                        if (row.isActive()) {
+                            Transaction transaction = row.getTransaction();
+                            Date day = DateConvertor.convertToDateViaSqlDate(datePicker.getValue());
+                            try {
+                                Controller.daoContainer.getTransactionDao().setDate(transaction, DateConvertor.toLong(day));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+
+                    return null;
+                }
+
+                @Override
+                protected void failed() {
+                    getException().printStackTrace();
+
+                }
+
+                @Override
+                protected void succeeded() {
+                    editWindow.close();
+                }
+            };
+        }
+    };
+    private HistoryController historyController;
+
+
+    public TransactionTable(HistoryController historyController) {
+        this.historyController = historyController;
         setOnMouseClicked(event -> {
             Scene scene = getScene();
-            if(scene!=null){
+            if (scene != null) {
                 cursorX = event.getSceneX();
                 cursorY = event.getSceneY();
             }
@@ -306,7 +327,7 @@ public class TransactionTable extends TableView<TransactionItem> {
         try {
             sourcePanel = new SeparateSourcePanel(Controller.modelStructure, editWindow);
             sourcePanel.getSelectBox().selectedProperty().addListener((observable, oldValue, newValue) -> {
-                if(newValue){
+                if (newValue) {
                     System.out.println("URUCHAMIAM SERWIS");
                     updateSource.reset();
                     updateSource.start();
@@ -319,18 +340,11 @@ public class TransactionTable extends TableView<TransactionItem> {
 
         contextMenu = buildContextMenu();
         selectTagBox = buildSelectTagBox();
-        tagPane.getChildren().add(selectTagBox);
-        sourcePane.getChildren().add(sourcePanel);
+        datePicker = buildDatePicker();
+        //tagPane.getChildren().add(selectTagBox);
+        //sourcePane.getChildren().add(sourcePanel);
 
 
-    }
-
-    public static Scene getTagScene() {
-        return tagScene;
-    }
-
-    public static Scene getSourceScene() {
-        return sourceScene;
     }
 
     private ContextMenu buildContextMenu() {
@@ -387,7 +401,12 @@ public class TransactionTable extends TableView<TransactionItem> {
                 selectNone.setDisable(false);
             }
         });
-
+        editDate.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showDateWindow();
+            }
+        });
         delete.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -400,12 +419,13 @@ public class TransactionTable extends TableView<TransactionItem> {
                 deleteTag();
             }
         });
+
         setTag.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
 
-                double x = setTag.getParentPopup().getX();
-                double y = setTag.getParentPopup().getY();
+                /*double x = setTag.getParentPopup().getX();
+                double y = setTag.getParentPopup().getY();*/
                 showTagWindow();
             }
         });
@@ -535,9 +555,32 @@ public class TransactionTable extends TableView<TransactionItem> {
         });
     }
 
+    public DatePicker buildDatePicker() {
+        DatePicker datePicker = new DatePicker();
+        LocalDate today = LocalDate.now();
+        datePicker.setValue(today);
+        //block future days
+        datePicker.setDayCellFactory(param -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.compareTo(today) > 0);
+            }
+        });
+        datePicker.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                updateDate.reset();
+                updateDate.start();
+            }
+        });
+        return datePicker;
+
+    }
+
     public SelectBox<Tag> buildSelectTagBox() {
 
-        //selectTagBox.addData(Controller.modelStructure.getTags());
+        SelectBox<Tag> selectTagBox = new SelectBox<>();
         selectTagBox.selectedProperty().addListener(((observable, oldValue, newValue) -> {
             boolean transactions = getClass().equals(TransactionTable.class);
             if (newValue) {
@@ -643,7 +686,13 @@ public class TransactionTable extends TableView<TransactionItem> {
     void showTagWindow() {
         selectTagBox.addData(Controller.modelStructure.getTags());
         editWindow.setContent(selectTagBox);
-        editWindow.show(cursorX,cursorY);
+        editWindow.show(cursorX, cursorY);
+    }
+
+    void showDateWindow() {
+        //selectTagBox.addData(Controller.modelStructure.getTags());
+        editWindow.setContent(datePicker);
+        editWindow.show(cursorX, cursorY);
     }
 
     void showSourceWindow() {
@@ -651,7 +700,7 @@ public class TransactionTable extends TableView<TransactionItem> {
         sourcePanel.reset();
         sourcePanel.enable();
         editWindow.setContent(sourcePanel);
-        editWindow.show(cursorX,cursorY);
+        editWindow.show(cursorX, cursorY);
 
     }
 

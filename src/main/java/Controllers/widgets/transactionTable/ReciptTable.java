@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class ReciptTable extends TransactionTable{
     public ReciptTable() {
-        super();
+        super(null);
 
         showTags();
     }

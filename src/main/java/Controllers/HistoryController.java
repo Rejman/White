@@ -23,7 +23,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 public class HistoryController extends Controller{
-    private TransactionTable transactionTable = new TransactionTable();
+    private TransactionTable transactionTable = new TransactionTable(this);
 
     public TransactionTable getTransactionTable() {
         return transactionTable;
@@ -43,6 +43,25 @@ public class HistoryController extends Controller{
     @FXML
     private SplitPane splitPane;
     private ScrollPane scrolPane;
+    public void refresh(){
+        groupVBox.getChildren().clear();
+        String lastDate = "-";
+        for(int i=0;i<historyPositions.size();i++){
+            HistoryPosition position = historyPositions.get(i);
+            //when next date - add label
+            String date = position.getDate();
+            if(!lastDate.equals(date)){
+                Label dateLabel = new Label(date);
+                //dateLabel.setPadding(new Insets(5));
+                //dateLabel.setStyle("-fx-font-weight: bold");
+                groupVBox.getChildren().add(dateLabel);
+            }
+            HBox.setHgrow(position,Priority.ALWAYS);
+            //VBox.setVgrow(position,Priority.ALWAYS);
+            groupVBox.getChildren().add(position);
+            lastDate = date;
+        }
+    }
     private Service buildHistory = new Service() {
         @Override
         protected Task createTask() {
@@ -96,23 +115,7 @@ public class HistoryController extends Controller{
 
                 @Override
                 protected void succeeded() {
-                    groupVBox.getChildren().clear();
-                    String lastDate = "-";
-                    for(int i=0;i<historyPositions.size();i++){
-                        HistoryPosition position = historyPositions.get(i);
-                        //when next date - add label
-                        String date = position.getDate();
-                        if(!lastDate.equals(date)){
-                            Label dateLabel = new Label(date);
-                            //dateLabel.setPadding(new Insets(5));
-                            //dateLabel.setStyle("-fx-font-weight: bold");
-                            groupVBox.getChildren().add(dateLabel);
-                        }
-                        HBox.setHgrow(position,Priority.ALWAYS);
-                        //VBox.setVgrow(position,Priority.ALWAYS);
-                        groupVBox.getChildren().add(position);
-                        lastDate = date;
-                    }
+                    refresh();
                     //Blocker.unbind();
                 }
             };
@@ -149,28 +152,10 @@ public class HistoryController extends Controller{
     private void addHistoryGroup(ArrayList<Transaction> group, long date, BigDecimal total) throws ParseException {
         //add date label
         String dateString = DateConvertor.toString(date);
-/*        Label dateLabel = new Label(dateString);
-        dateLabel.setPadding(new Insets(5));
-        dateLabel.setStyle("-fx-font-weight: bold");*/
+
         historyPositions.add(new HistoryPosition(group, dateString, total));
     }
-/*    private void addHistoryPositions() throws ParseException {
-        String lastDate = "0";
-        groupVBox.getChildren().clear();
-        for(int i=0;i<groups.size();i++){
-            Transaction first = (Transaction) groups.get(i).get(0);
-            String date = DateConvertor.toString(first.getDate());
-            Label dateLabel = new Label(date);
-            dateLabel.setPadding(new Insets(5));
-            dateLabel.setStyle("-fx-font-weight: bold");
-            if(!lastDate.equals(date)) groupVBox.getChildren().add(dateLabel);
 
-            HistoryPosition historyPosition = new HistoryPosition(groups.get(i), groupTotals.get(i));
-
-            groupVBox.getChildren().add(historyPosition);
-            lastDate = date;
-        }
-    }*/
     private void transactionGrouping() throws ParseException {
         ArrayList<Transaction> list = null;
         String oldGroupId = "-";

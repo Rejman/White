@@ -80,6 +80,12 @@ public class HistoryPosition extends HBox {
         getChildren().add(totalLabel);
 
     }
+    public void addTransaction(Transaction transaction){
+        transactions.add(transaction);
+    }
+    public void deleteTransaction(Transaction transaction){
+        transactions.remove(transaction);
+    }
     public HistoryPosition(ArrayList<Transaction> transactions, String date, BigDecimal total) throws ParseException {
 
         getStyleClass().add("historyPosition");
