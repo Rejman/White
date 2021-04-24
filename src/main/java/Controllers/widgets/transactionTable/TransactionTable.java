@@ -260,6 +260,7 @@ public class TransactionTable extends TableView<TransactionItem> {
                 @Override
                 protected void succeeded() {
 
+                    historyController.refresh();
                 }
             };
         }
@@ -276,7 +277,9 @@ public class TransactionTable extends TableView<TransactionItem> {
                         if (row.isActive()) {
                             Transaction transaction = row.getTransaction();
                             Date day = DateConvertor.convertToDateViaSqlDate(datePicker.getValue());
+
                             try {
+                                transaction.setDate(DateConvertor.toLong(day));
                                 Controller.daoContainer.getTransactionDao().setDate(transaction, DateConvertor.toLong(day));
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -296,7 +299,10 @@ public class TransactionTable extends TableView<TransactionItem> {
 
                 @Override
                 protected void succeeded() {
+                    System.out.println("zmiana dany");
+                    historyController.refresh();
                     editWindow.close();
+
                 }
             };
         }
