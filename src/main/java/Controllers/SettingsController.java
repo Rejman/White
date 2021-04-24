@@ -129,7 +129,7 @@ public class SettingsController extends Controller{
     private HBox container;
     @FXML
     void initialize() {
-        Controller.setAutoSize(container,100,100);
+        //Controller.setAutoSize(container,100,100);
         buildTree();
     }
 

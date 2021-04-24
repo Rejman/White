@@ -1,5 +1,6 @@
 package Controllers;
 
+import Controllers.widgets.ToolPane;
 import Dao.DaoContainer;
 import Models.Expense;
 import Models.Source;
@@ -312,9 +313,32 @@ public class MainController extends Controller {
 
     @FXML
     void settings(ActionEvent event) {
-        loadNewView("Settings", "Settings");
+        FXMLLoader loader = new FXMLLoader(this.getClass().getResource("/fxml/Settings.fxml"));
+        /*try {
+            viewsContainer.getChildren().add(loader.load());
+            if (primaryStage != null) {
+                primaryStage.setTitle(title);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error: load " + url);
+        }*/
+
+        ToolPane toolPane = new ToolPane();
+        try {
+            toolPane.setContent(loader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*double x = primaryStage.getWidth()/2;
+        double y = primaryStage.getHeight()/2;*/
+        
+        //pojawienie się okna ustaweń w górnym lewym rogu o 100 px
+        toolPane.show(100,100);
+        /*loadNewView("Settings", "Settings");
         unselectAllToggleButtons();
-        settingsButton.setSelected(true);
+        settingsButton.setSelected(true);*/
     }
 
     @FXML
