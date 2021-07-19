@@ -41,9 +41,9 @@ public class HistoryController extends Controller {
 
                     transactions = daoContainer.getTransactionDao().selectAllSorted();
 
-                    if (transactions.size() > 0) {
+/*                    if (transactions.size() > 0) {
                         historyPositions.clear();
-                    }
+                    }*/
 
                     return null;
                 }

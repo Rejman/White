@@ -41,7 +41,7 @@ public class TransactionTable extends TableView<TransactionItem> {
     private ToolPane editWindow = new ToolPane();
     private double cursorX;
     private double cursorY;
-    private ContextMenu contextMenu;
+    protected ContextMenu contextMenu;
     private TableColumn<String, TransactionItem> nameTableColumn = new TableColumn<>("name");
     private TableColumn<String, TransactionItem> quantityTableColumn = new TableColumn<>("number");
     private TableColumn<String, TransactionItem> unitTableColumn = new TableColumn<>("unit");
@@ -213,6 +213,7 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
+    private HistoryController historyController;
     private Service updateSource = new Service() {
         @Override
         protected Task createTask() {
@@ -307,7 +308,6 @@ public class TransactionTable extends TableView<TransactionItem> {
             };
         }
     };
-    private HistoryController historyController;
 
 
     public TransactionTable(HistoryController historyController) {
@@ -345,6 +345,8 @@ public class TransactionTable extends TableView<TransactionItem> {
         }
 
         contextMenu = buildContextMenu();
+
+        this.setContextMenu(contextMenu);
         selectTagBox = buildSelectTagBox();
         datePicker = buildDatePicker();
         //tagPane.getChildren().add(selectTagBox);
@@ -354,22 +356,14 @@ public class TransactionTable extends TableView<TransactionItem> {
     }
 
     private ContextMenu buildContextMenu() {
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getStyleClass().add("context");
+        EditMenu editMenu = new TransactionMenu(selectedNumber);
 
-        Menu select = new Menu("select");
-        Menu tag = new Menu("tag");
-        tag.setDisable(true);
+
+
+        MenuItem rabat = new MenuItem("rabat");
+
         Menu edit = new Menu("edit");
         edit.setDisable(true);
-
-        MenuItem delete = new MenuItem("delete");
-        delete.setDisable(true);
-        MenuItem selectAll = new MenuItem("all");
-        MenuItem selectNone = new MenuItem("none");
-        selectNone.setDisable(true);
-        select.getItems().add(selectAll);
-        select.getItems().add(selectNone);
 
         MenuItem editSource = new MenuItem("source");
         MenuItem editDate = new MenuItem("date");
@@ -380,18 +374,19 @@ public class TransactionTable extends TableView<TransactionItem> {
 
         MenuItem deleteTag = new MenuItem("delete");
         MenuItem setTag = new MenuItem("add/set");
-        tag.getItems().add(setTag);
-        tag.getItems().add(deleteTag);
+/*        tag.getItems().add(setTag);
+        tag.getItems().add(deleteTag);*/
 
-        contextMenu.getItems().add(select);
-        contextMenu.getItems().add(delete);
-        contextMenu.getItems().add(new SeparatorMenuItem());
-        if (getClass().equals(TransactionTable.class)) contextMenu.getItems().add(edit);
-        contextMenu.getItems().add(tag);
+        /*contextMenu.getItems().add(select);
+        contextMenu.getItems().add(delete);*/
+        //contextMenu.getItems().add(new SeparatorMenuItem());
+        //if (getClass().equals(TransactionTable.class)) contextMenu.getItems().add(edit);
+        //contextMenu.getItems().add(tag);
+        //contextMenu.getItems().add(rabat);
 
-        setContextMenu(contextMenu);
+        setContextMenu(editMenu);
 
-        selectedNumber.addListener((observable, oldValue, newValue) -> {
+/*        selectedNumber.addListener((observable, oldValue, newValue) -> {
 
             if (newValue.equals(0)) {
                 select.setText("select");
@@ -406,32 +401,34 @@ public class TransactionTable extends TableView<TransactionItem> {
                 delete.setDisable(false);
                 selectNone.setDisable(false);
             }
-        });
+        });*/
         editDate.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 showDateWindow();
             }
         });
-        delete.setOnAction(new EventHandler<ActionEvent>() {
+        editMenu.setOnDelete(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 deleteSelected();
             }
         });
-        deleteTag.setOnAction(new EventHandler<ActionEvent>() {
+        editMenu.setOnDeleteTag(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 deleteTag();
             }
         });
-
-        setTag.setOnAction(new EventHandler<ActionEvent>() {
+/*        editMenu.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
-                /*double x = setTag.getParentPopup().getX();
-                double y = setTag.getParentPopup().getY();*/
+                showRabatWindow();
+            }
+        });*/
+        editMenu.setOnSetTag(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
                 showTagWindow();
             }
         });
@@ -441,19 +438,19 @@ public class TransactionTable extends TableView<TransactionItem> {
                 showSourceWindow();
             }
         });
-        selectAll.setOnAction(new EventHandler<ActionEvent>() {
+        editMenu.setOnSelectAll(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 selectAll();
             }
         });
-        selectNone.setOnAction(new EventHandler<ActionEvent>() {
+        editMenu.setOnSelectNone(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 unselectAll();
             }
         });
-        return contextMenu;
+        return editMenu;
     }
 
     private TableColumn[] buildColumns() {
@@ -682,13 +679,14 @@ public class TransactionTable extends TableView<TransactionItem> {
         deleteSelected.reset();
         deleteSelected.start();
     }
-
     void deleteTag() {
         selectedNumber.setValue(0);
         deleteTag.reset();
         deleteTag.start();
     }
+    void showRabatWindow(){
 
+    }
     void showTagWindow() {
         selectTagBox.addData(Controller.modelStructure.getTags());
         editWindow.setContent(selectTagBox);
